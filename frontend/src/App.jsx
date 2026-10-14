@@ -1,13 +1,4 @@
-import { Route, Routes } from "react-router-dom";
-
-import CreateTripPage from "./pages/CreateTripPage.jsx";
-import TripPage from "./pages/TripPage.jsx";
-
+// TODO (Frontend 1): подключить маршрутизацию (react-router-dom) и страницы из pages/
 export default function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<CreateTripPage />} />
-      <Route path="/trip/:inviteCode" element={<TripPage />} />
-    </Routes>
-  );
+  return <h1>ВПуть</h1>;
 }

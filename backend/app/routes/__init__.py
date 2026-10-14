@@ -1,7 +1,2 @@
-from . import checklist, expenses, participants, stops, tickets, trips
-
-
-def register_routes(app):
-    """Подключает все разделы API к приложению."""
-    for module in (trips, participants, stops, expenses, tickets, checklist):
-        app.register_blueprint(module.bp)
+# Регистрация всех разделов API (blueprint-ов) в приложении.
+# Владелец: Backend 1.

@@ -5,23 +5,17 @@ from .config import Config
 from .extensions import db
 
 
-def create_app(test_config=None):
-    """Создаёт и настраивает Flask-приложение."""
+def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    if test_config:
-        app.config.update(test_config)
+    app.json.ensure_ascii = False
 
-    app.json.ensure_ascii = False  # русский текст в ответах не превращается в \uXXXX
-    CORS(app)  # разрешаем запросы с React (localhost:5173)
+    CORS(app)
     db.init_app(app)
 
-    from . import models  # noqa: F401  (нужно, чтобы SQLAlchemy увидел таблицы)
-    from .routes import register_routes
-
-    register_routes(app)
+    # TODO (Backend 1): подключить models и routes, когда они появятся
 
     with app.app_context():
-        db.create_all()  # создаёт таблицы, если их ещё нет
+        db.create_all()
 
     return app
