@@ -36,3 +36,18 @@ def test_participant_requires_both_names(client):
         f"/trips/{trip['id']}/participants", json={"first_name": "Анна"}
     )
     assert response.status_code == 400
+
+
+def test_list_trips(client):
+    assert client.get("/trips").get_json() == []
+
+    from app.extensions import db
+    from app.models import TripModel
+
+    with client.application.app_context():
+        db.session.add(TripModel(name="Грузия", invite_code="gruz2026"))
+        db.session.commit()
+
+    trips = client.get("/trips").get_json()
+    assert [t["name"] for t in trips] == ["Грузия"]
+    assert trips[0]["flight_time"] is None

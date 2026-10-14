@@ -19,3 +19,4 @@
 | GET | /trips/<id>/checklist | чек-лист | Backend 3 | |
 | POST | /trips/<id>/checklist | добавить пункт | Backend 3 | |
 | PUT | /checklist/<id> | отметить выполненным | Backend 3 | |
+| GET | /trips | список всех поездок (учебный пример, по ТЗ не нужен) | пример | |

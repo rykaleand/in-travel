@@ -1,0 +1,28 @@
+# Запуск всего проекта одной командой (из корня репозитория):
+#   docker compose -f docker/docker-compose.yml up --build
+# Backend: http://localhost:5000, frontend: http://localhost:5173.
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/backend.Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      HOST: 0.0.0.0  # чтобы backend был виден снаружи контейнера
+    volumes:
+      # Код и файл базы intravel.db лежат в вашей папке backend/:
+      # правки в коде сразу подхватываются, а данные не пропадают при перезапуске.
+      - ../backend:/app
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules  # node_modules остаются те, что поставили внутри контейнера
+    depends_on:
+      - backend

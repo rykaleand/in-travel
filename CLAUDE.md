@@ -27,16 +27,20 @@
 
 - Backend: Python, Flask, Flask-SQLAlchemy, SQLite, flask-cors
 - Frontend: React (Vite), JavaScript, запросы через `fetch`
-- Без Docker, PostgreSQL, Redux и TypeScript
+- Docker используется только для запуска (папка `docker/`, необязательно); без PostgreSQL, Redux и TypeScript
 
 ## Структура
 
-- `backend/app/models/`: таблицы базы данных
-- `backend/app/routes/`: эндпоинты API, один файл на раздел
+- `backend/app/routes/`: контроллеры, эндпоинты API, один файл на раздел
+- `backend/app/schemas/`: DTO запросов и ответов (dataclass)
 - `backend/app/services/`: бизнес-логика без Flask (расчёт долгов, разбор ссылок)
+- `backend/app/repositories/`: все запросы к базе, принимают и возвращают доменные модели
+- `backend/app/domain/`: доменные модели (dataclass, без Flask и SQLAlchemy)
+- `backend/app/models/`: таблицы базы данных
 - `backend/tests/`: автотесты (pytest)
 - `frontend/src/api/`: запросы к бэкенду
 - `frontend/src/pages/`, `frontend/src/components/`: экраны и их части
+- `docker/`: Dockerfile-ы и `docker-compose.yml` для запуска проекта (не меняй без нужды)
 - `docs/`: ТЗ, список эндпоинтов, макеты
 
 ## Данные
@@ -46,6 +50,10 @@
 Информация о билете хранится полями в TRIPS (`ticket_link`, `flight_number`, `flight_time`).
 
 ## Правила backend
+
+- Слои: routes → services → repositories → models. Новая сущность это по файлу в каждой папке.
+  Образец: учебный пример `GET /trips` (описан в `README.md`). Делай новый код по его образцу.
+- Flask и `request` только в `routes/`, SQLAlchemy только в `repositories/` и `models/`.
 
 - Пути и методы эндпоинтов строго по `docs/api.md` и ТЗ. Добавил или изменил эндпоинт: обнови `docs/api.md`.
 - Ответы в JSON. Ошибки в формате `{"error": "понятный текст на русском"}` с кодом 400 или 404.
@@ -63,6 +71,17 @@
 - Для каждого экрана продумай три состояния: загрузка, пустой список, ошибка.
 - Вёрстка должна работать на экранах от 360 пикселей шириной.
 
+## Тестовые (учебные) ручки
+
+Это образцы для студентов, по ТЗ их нет. Не развивай их как функциональность и не считай задачами проекта.
+
+- `GET /trips` (список всех поездок): `routes/trips.py`, функция `list_trips`. Строка есть в `docs/api.md`.
+- Тест `test_list_trips` в `backend/tests/test_trips.py`.
+- Frontend-пример: `frontend/src/pages/ExamplePage.jsx`, `frontend/src/components/example/`, `getTrips` в `api/client.js`. Сейчас `App.jsx` показывает эту страницу, пока Frontend 1 не подключил маршрутизацию.
+- `backend/seed_example.py`: кладёт в базу две тестовые поездки.
+- Файлы слоёв `trip.py` (в `models/`, `domain/`, `schemas/`, `repositories/`, `services/`) и таблицы `trips`/`participants` настоящие: Backend 1 дополняет их. Стиль новых файлов бери из них.
+- Если студент просит сделать свою ручку, предлагай копировать структуру этого примера.
+
 ## Не входит в MVP (не предлагай и не добавляй)
 
 Авторизация, голосование за точки маршрута в реальном времени, live-статус рейсов,
@@ -77,6 +96,9 @@ cd backend && pytest                                       # тесты
 
 # frontend
 cd frontend && npm run dev                                 # http://localhost:5173
+
+# всё сразу в Docker (из корня репозитория)
+docker compose -f docker/docker-compose.yml up --build
 ```
 
 ## Git
