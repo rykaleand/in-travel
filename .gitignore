@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# База данных SQLite (создаётся автоматически, в git не кладём)
+*.db
+
+# Node
+node_modules/
+dist/
+
+# Окружение и редакторы
+.env
+.idea/
+.vscode/
+.DS_Store
