@@ -13,3 +13,5 @@ class TripModel(db.Model):
     ticket_link = db.Column(db.String(500))
     flight_number = db.Column(db.String(20))
     flight_time = db.Column(db.DateTime)
+    
+    participants = db.relationship("ParticipantModel", back_populates="trip", cascade="all, delete-orphan")
