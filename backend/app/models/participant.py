@@ -11,3 +11,5 @@ class ParticipantModel(db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey("trips.id"), nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
+    
+    trip = db.relationship("TripModel", back_populates="participants")
