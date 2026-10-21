@@ -6,3 +6,6 @@
 STOP_STATUS_PROPOSED = "proposed"
 STOP_STATUS_CONFIRMED = "confirmed"
 STOP_STATUSES = [STOP_STATUS_PROPOSED, STOP_STATUS_CONFIRMED]
+
+# Категории расходов: еда, транспорт, жильё, развлечения, другое.
+EXPENSE_CATEGORIES = ["еда", "транспорт", "жильё", "развлечения", "другое"]
