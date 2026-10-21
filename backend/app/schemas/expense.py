@@ -1,4 +1,5 @@
 # DTO расхода: что присылает клиент (ExpenseRequest) и как расход выглядит в ответе (ExpenseResponse).
+# Поля согласованы с #9.
 from dataclasses import asdict, dataclass, field
 from typing import Optional
 
@@ -9,7 +10,6 @@ class ExpenseRequest:
     category: Optional[str]
     payer_id: Optional[int]  # id участника, который заплатил
     participant_ids: list[int] = field(default_factory=list)  # между кем делим расход
-    title: Optional[str] = None  # по ТЗ название не обязательно
 
     @classmethod
     def from_dict(cls, data):
@@ -19,7 +19,6 @@ class ExpenseRequest:
             category=data.get("category"),
             payer_id=data.get("payer_id"),
             participant_ids=data.get("participant_ids") or [],
-            title=data.get("title"),
         )
 
 
@@ -27,11 +26,9 @@ class ExpenseRequest:
 class ExpenseResponse:
     id: int
     trip_id: int
-    title: Optional[str]
-    amount: float
     category: str
     payer_id: int
-    created_at: Optional[str]  # дата строкой, потому что в JSON нет типа datetime
+    amount: float
     shares: list[dict]  # [{"participant_id": 1, "share_amount": 33.34}, ...]
 
     @classmethod
@@ -40,11 +37,9 @@ class ExpenseResponse:
         return cls(
             id=expense.id,
             trip_id=expense.trip_id,
-            title=expense.title,
-            amount=expense.amount,
             category=expense.category,
             payer_id=expense.payer_id,
-            created_at=expense.created_at.isoformat() if expense.created_at else None,
+            amount=expense.amount,
             shares=[
                 {"participant_id": share.participant_id, "share_amount": share.share_amount}
                 for share in expense.shares

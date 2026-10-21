@@ -1,4 +1,5 @@
 # Репозиторий: читает и сохраняет расходы вместе с долями, отдаёт доменные модели Expense.
+# Суммы сюда приходят уже проверенными и округлёнными: это делает сервис.
 from ..domain.expense import Expense, ExpenseShare
 from ..extensions import db
 from ..models.expense import ExpenseModel, ExpenseShareModel
@@ -9,36 +10,33 @@ def _to_domain(row):
     return Expense(
         id=row.id,
         trip_id=row.trip_id,
-        title=row.title,
-        amount=row.amount,
         category=row.category,
         payer_id=row.payer_id,
-        created_at=row.created_at,
+        amount=row.amount,
         shares=[
-            ExpenseShare(id=share.id, participant_id=share.participant_id, share_amount=share.share_amount)
+            ExpenseShare(participant_id=share.participant_id, share_amount=share.share_amount)
             for share in row.shares
         ],
     )
 
 
 def get_by_trip(trip_id):
-    """Все расходы одной поездки, по порядку добавления."""
+    """Все расходы одной поездки с их долями, по порядку добавления."""
     rows = ExpenseModel.query.filter_by(trip_id=trip_id).order_by(ExpenseModel.id).all()
     return [_to_domain(row) for row in rows]
 
 
 def create(expense):
-    """Сохраняет расход и его доли. Деньги округляем до двух знаков."""
+    """Сохраняет расход и его доли вместе, одним commit."""
     row = ExpenseModel(
         trip_id=expense.trip_id,
-        title=expense.title,
-        amount=round(expense.amount, 2),
         category=expense.category,
         payer_id=expense.payer_id,
+        amount=expense.amount,
     )
     for share in expense.shares:
         row.shares.append(
-            ExpenseShareModel(participant_id=share.participant_id, share_amount=round(share.share_amount, 2))
+            ExpenseShareModel(participant_id=share.participant_id, share_amount=share.share_amount)
         )
     db.session.add(row)
     db.session.commit()
