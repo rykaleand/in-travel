@@ -12,10 +12,10 @@ def _to_domain(row):
         title=row.title,
         amount=row.amount,
         category=row.category,
-        paid_by=row.paid_by,
+        payer_id=row.payer_id,
         created_at=row.created_at,
         shares=[
-            ExpenseShare(id=share.id, participant_id=share.participant_id, amount=share.amount)
+            ExpenseShare(id=share.id, participant_id=share.participant_id, share_amount=share.share_amount)
             for share in row.shares
         ],
     )
@@ -34,11 +34,11 @@ def create(expense):
         title=expense.title,
         amount=round(expense.amount, 2),
         category=expense.category,
-        paid_by=expense.paid_by,
+        payer_id=expense.payer_id,
     )
     for share in expense.shares:
         row.shares.append(
-            ExpenseShareModel(participant_id=share.participant_id, amount=round(share.amount, 2))
+            ExpenseShareModel(participant_id=share.participant_id, share_amount=round(share.share_amount, 2))
         )
     db.session.add(row)
     db.session.commit()
