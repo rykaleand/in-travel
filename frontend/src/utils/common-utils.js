@@ -6,3 +6,15 @@ export function toNumber(value) {
   }
   return n;
 }
+
+// Полное имя участника: «Анна Иванова».
+export function fullName(participant) {
+  return `${participant.first_name} ${participant.last_name}`.trim();
+}
+
+// Инициалы участника для кружков-аватарок: «АИ».
+export function getInitials(participant) {
+  const first = participant.first_name?.[0] || "";
+  const last = participant.last_name?.[0] || "";
+  return (first + last).toUpperCase();
+}
