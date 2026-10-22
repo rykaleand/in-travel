@@ -1,5 +1,6 @@
 # Репозиторий: читает поездки из базы и отдаёт доменные модели Trip.
 from ..domain.trip import Trip
+from ..extensions import db
 from ..models.trip import TripModel
 
 
@@ -18,3 +19,9 @@ def _to_domain(row):
 def get_all():
     rows = TripModel.query.order_by(TripModel.id).all()
     return [_to_domain(row) for row in rows]
+
+
+def get_by_id(trip_id):
+    """Одна поездка или None, если такой нет."""
+    row = db.session.get(TripModel, trip_id)
+    return _to_domain(row) if row else None
