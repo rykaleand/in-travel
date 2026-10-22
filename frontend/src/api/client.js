@@ -3,7 +3,7 @@
 const API_URL = "http://localhost:5000";
 
 // Общая функция: отправляет запрос, возвращает JSON или бросает ошибку с понятным текстом.
-async function request(path, options = {}) {
+export async function request(path, options = {}) {
   const response = await fetch(API_URL + path, options);
   const data = await response.json();
   if (!response.ok) {
