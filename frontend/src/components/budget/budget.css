@@ -1,70 +1,339 @@
-/* Раскладка вкладки бюджета. Здесь только расположение блоков,
-   цвета и шрифты придут из src/styles/ от дизайнера. */
+/* Вкладка бюджета. Все цвета и скругления берутся из styles/style.css. */
 
 .budget-tab {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  max-width: 600px;
+  gap: 20px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 24px 16px;
   box-sizing: border-box;
+  color: var(--color-text);
+  font-family: var(--font-family);
 }
 
-.expense-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+/* ---------- Шапка: подсказка и кнопка «Новая трата» ---------- */
 
-.expense-form__field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Поля на всю ширину, чтобы на телефоне было удобно нажимать */
-.expense-form input[type="text"],
-.expense-form select,
-.expense-form button {
-  width: 100%;
-  min-height: 40px;
-  box-sizing: border-box;
-  font-size: 16px; /* меньше 16px iPhone увеличивает страницу при вводе */
-}
-
-.expense-form__checkbox {
+.budget-tab__header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 32px;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.expense-list,
-.category-totals ul {
-  list-style: none;
-  padding: 0;
+.budget-tab__intro {
   margin: 0;
+  color: var(--color-text-muted);
+  font-size: 16px;
 }
 
-/* Строка: слева текст, справа сумма */
-.expense-item,
-.category-totals li {
+/* На телефоне кнопка уходит под текст и растягивается */
+@media (max-width: 520px) {
+  .budget-tab__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.budget-hint {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-soft);
+  font-size: 14px;
+}
+
+/* ---------- Кнопки ---------- */
+
+.btn {
+  min-height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.btn--secondary {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+/* ---------- Карточки: итоги и список трат ---------- */
+
+.budget-card {
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.budget-card__title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.totals-list,
+.expense-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.totals-list__row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   gap: 12px;
   padding: 8px 0;
 }
 
-.expense-item__amount,
-.category-totals li span:last-child {
-  white-space: nowrap; /* сумма не переносится на две строки */
+.totals-list__row--total {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+  font-weight: 600;
 }
 
-.category-totals__total {
-  font-weight: bold;
+.money {
+  white-space: nowrap; /* сумма не переносится на две строки */
+  font-variant-numeric: tabular-nums;
+}
+
+.expense-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.expense-item + .expense-item {
+  border-top: 1px solid var(--color-border);
+}
+
+.expense-item__info {
+  flex: 1;
+  min-width: 0; /* чтобы длинное имя не раздвигало строку */
+}
+
+.expense-item__category {
+  font-weight: 500;
+}
+
+.expense-item__meta {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.expense-item__amount {
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Кружок с инициалами в списке */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ---------- Состояния: загрузка, ошибка, пусто ---------- */
+
+.budget-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.budget-state p {
+  margin: 0;
+}
+
+.budget-state--error {
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--color-primary-soft);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: budget-spin 0.8s linear infinite;
+}
+
+@keyframes budget-spin {
+  to { transform: rotate(360deg); }
+}
+
+.budget-empty {
+  padding: 16px 0 4px;
+  text-align: center;
+}
+
+.budget-empty__title {
+  margin: 0 0 4px;
+  font-weight: 500;
+}
+
+.budget-empty__text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+/* ---------- Форма новой траты (внутри модального окна) ---------- */
+
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.expense-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.expense-form__label {
+  padding: 0;
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+.expense-form__input {
+  width: 100%;
+  min-height: 52px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 18px; /* не меньше 16px, иначе iPhone увеличивает страницу при вводе */
+}
+
+.expense-form__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.expense-form__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.expense-form__error {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: 14px;
+}
+
+/* Ряд кнопок-«чипсов», переносится на новую строку */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Категория: вытянутая кнопка */
+.chip {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+/* Участник: круглая кнопка с инициалами */
+.avatar-chip {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+/* Подсветка при наведении только там, где есть мышь (на телефоне она «залипает») */
+@media (hover: hover) {
+  .chip:not(.is-selected):hover,
+  .avatar-chip:not(.is-selected):hover {
+    background: var(--color-bg);
+  }
+}
+
+/* Выбранный элемент: голубой фон и синий текст */
+.chip.is-selected,
+.avatar-chip.is-selected {
+  border-color: var(--color-primary-soft);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.chip:focus-visible,
+.avatar-chip:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
