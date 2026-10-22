@@ -55,3 +55,9 @@ def get_participant_ids(trip_id):
     """Номера (id) всех участников поездки."""
     rows = ParticipantModel.query.filter_by(trip_id=trip_id).all()
     return {row.id for row in rows}
+
+
+def get_participant_names(trip_id):
+    """Участники поездки по порядку: {id: "Имя Фамилия"}."""
+    rows = ParticipantModel.query.filter_by(trip_id=trip_id).order_by(ParticipantModel.id).all()
+    return {row.id: f"{row.first_name} {row.last_name}" for row in rows}
