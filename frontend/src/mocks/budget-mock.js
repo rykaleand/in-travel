@@ -1,6 +1,6 @@
 // ТОЛЬКО ДЛЯ ЛОКАЛЬНОГО ПРОСМОТРА вкладки бюджета без бэкенда.
-// Подменяет fetch: на запросы участников и трат отвечает выдуманными данными
-// в том же формате, что и сервер (задача #9). Остальные запросы уходят как обычно.
+// Подменяет fetch: на запросы участников, трат и балансов отвечает выдуманными данными
+// в том же формате, что и сервер (задачи #9 и #10). Остальные запросы уходят как обычно.
 // Подключается в App.jsx вызовом installBudgetMock().
 
 const participants = [
@@ -30,6 +30,43 @@ function splitAmount(amount, ids) {
 
 function makeExpense(id, category, payerId, amount, ids) {
   return { id, trip_id: 1, category, payer_id: payerId, amount, shares: splitAmount(amount, ids) };
+}
+
+// Балансы и переводы считаем так же, как сервер (#10), только в копейках:
+// баланс = сколько заплатил минус его доли; переводы жадно, от самого большого должника
+// к самому большому кредитору.
+function calculateBalances() {
+  const cents = {};
+  for (const p of participants) cents[p.id] = 0;
+  for (const e of expenses) {
+    cents[e.payer_id] += Math.round(e.amount * 100);
+    for (const s of e.shares) cents[s.participant_id] -= Math.round(s.share_amount * 100);
+  }
+
+  const nameOf = (id) => {
+    const p = participants.find((x) => x.id === id);
+    return `${p.first_name} ${p.last_name}`;
+  };
+  const balances = participants.map((p) => ({
+    participant_id: p.id,
+    name: nameOf(p.id),
+    balance: cents[p.id] / 100,
+  }));
+
+  const creditors = participants.filter((p) => cents[p.id] > 0).map((p) => ({ id: p.id, left: cents[p.id] }));
+  const debtors = participants.filter((p) => cents[p.id] < 0).map((p) => ({ id: p.id, left: -cents[p.id] }));
+  const transfers = [];
+  while (creditors.length && debtors.length) {
+    creditors.sort((a, b) => b.left - a.left);
+    debtors.sort((a, b) => b.left - a.left);
+    const sum = Math.min(creditors[0].left, debtors[0].left);
+    transfers.push({ from: nameOf(debtors[0].id), to: nameOf(creditors[0].id), amount: sum / 100 });
+    creditors[0].left -= sum;
+    debtors[0].left -= sum;
+    if (creditors[0].left === 0) creditors.shift();
+    if (debtors[0].left === 0) debtors.shift();
+  }
+  return { balances, transfers };
 }
 
 function jsonResponse(data, status = 200) {
@@ -74,6 +111,11 @@ export function installBudgetMock() {
       const created = makeExpense(nextId++, body.category, body.payer_id, body.amount, body.participant_ids);
       expenses = [...expenses, created];
       return jsonResponse(created, 201);
+    }
+
+    if (path.endsWith("/balances") && method === "GET") {
+      await wait(400);
+      return jsonResponse(calculateBalances());
     }
 
     return realFetch(url, options);

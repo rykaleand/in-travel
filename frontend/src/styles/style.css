@@ -18,7 +18,11 @@
   --color-primary-soft: #dfe9fb;
   --color-on-primary: #ffffff;
 
-  /* Ошибки */
+  /* Успех и положительный баланс */
+  --color-success: #1f8a4c;
+  --color-success-soft: #e3f5ea;
+
+  /* Ошибки и отрицательный баланс */
   --color-danger: #c62f2f;
   --color-danger-soft: #fdecec;
 
