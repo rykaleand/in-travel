@@ -1,0 +1,70 @@
+/* Раскладка вкладки бюджета. Здесь только расположение блоков,
+   цвета и шрифты придут из src/styles/ от дизайнера. */
+
+.budget-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.expense-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Поля на всю ширину, чтобы на телефоне было удобно нажимать */
+.expense-form input[type="text"],
+.expense-form select,
+.expense-form button {
+  width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
+  font-size: 16px; /* меньше 16px iPhone увеличивает страницу при вводе */
+}
+
+.expense-form__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+
+.expense-list,
+.category-totals ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Строка: слева текст, справа сумма */
+.expense-item,
+.category-totals li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.expense-item__amount,
+.category-totals li span:last-child {
+  white-space: nowrap; /* сумма не переносится на две строки */
+}
+
+.category-totals__total {
+  font-weight: bold;
+}
