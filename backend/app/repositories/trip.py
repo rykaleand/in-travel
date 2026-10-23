@@ -34,3 +34,8 @@ def create(trip):
     db.session.add(row)
     db.session.commit()
     return _to_domain(row)
+
+def get_by_id(trip_id):
+    """Одна поездка или None, если такой нет."""
+    row = db.session.get(TripModel, trip_id)
+    return _to_domain(row) if row else None

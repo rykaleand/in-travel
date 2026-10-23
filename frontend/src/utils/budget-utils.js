@@ -19,3 +19,29 @@ export function convertAmounts(value) {
   }
   return value;
 }
+
+// Фиксированный список категорий расходов (#30).
+// value точно такие же, как EXPENSE_CATEGORIES в backend/app/constants.py.
+export const EXPENSE_CATEGORIES = [
+  { value: "еда", label: "Еда" },
+  { value: "транспорт", label: "Транспорт" },
+  { value: "жильё", label: "Жильё" },
+  { value: "развлечения", label: "Развлечения" },
+  { value: "другое", label: "Другое" },
+];
+
+// Название категории для показа. Незнакомую категорию показываем как есть.
+export function categoryLabel(value) {
+  const found = EXPENSE_CATEGORIES.find((c) => c.value === value);
+  return found ? found.label : value;
+}
+
+// Сумма в виде «1 234,50 ₽».
+export function formatMoney(amount) {
+  return (
+    Number(amount).toLocaleString("ru-RU", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }) + " ₽"
+  );
+}
