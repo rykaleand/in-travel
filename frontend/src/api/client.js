@@ -11,8 +11,3 @@ export async function request(path, options = {}) {
   }
   return data;
 }
-
-// ПРИМЕР: GET /trips, список всех поездок.
-export function getTrips() {
-  return request("/trips");
-}
