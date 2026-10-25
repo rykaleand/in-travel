@@ -1,5 +1,5 @@
-// Вкладка бюджета: итоги по категориям, список трат и кнопка «Новая трата» (форма в модальном окне).
-// Баланс и переводы будут в #31.
+// Вкладка бюджета: итоги по категориям, балансы и переводы, список трат
+// и кнопка «Новая трата» (форма в модальном окне).
 // Загружает данные и держит состояния «загрузка / ошибка», остальные компоненты только показывают.
 // Владелец: Frontend 3.
 import { useEffect, useState } from "react";
@@ -8,6 +8,7 @@ import { getExpenses } from "../../api/budget-client.js";
 import { getParticipants } from "../../api/participants-client.js";
 import Modal from "../common/Modal.jsx";
 import AddExpenseForm from "./AddExpenseForm.jsx";
+import BalancesBlock from "./BalancesBlock.jsx";
 import CategoryTotals from "./CategoryTotals.jsx";
 import ExpenseList from "./ExpenseList.jsx";
 import "./budget.css";
@@ -21,8 +22,8 @@ export default function BudgetTab({ tripId }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   // Растёт при нажатии «Попробовать снова»: тогда данные загружаются заново.
   const [reloadKey, setReloadKey] = useState(0);
-  // Растёт после каждой новой траты. Блок баланса будет следить за ним
-  // и перезагружать балансы: <BalanceBlock tripId={tripId} key={balancesVersion} />.
+  // Растёт после каждой новой траты. Это key у блока балансов:
+  // новый key, и блок загружает балансы заново.
   const [balancesVersion, setBalancesVersion] = useState(0);
 
   // Загружаем траты и участников одновременно.
@@ -92,6 +93,8 @@ export default function BudgetTab({ tripId }) {
       )}
 
       <CategoryTotals expenses={expenses} />
+
+      <BalancesBlock tripId={tripId} key={balancesVersion} />
 
       <section className="budget-card">
         <h3 className="budget-card__title">Расходы</h3>
