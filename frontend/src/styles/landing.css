@@ -1,0 +1,54 @@
+/* Стартовая страница. Цвета и скругления — из styles/style.css. */
+
+.landing {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.landing__card {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px 24px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.landing__title {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: 40px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.landing__text {
+  margin: 0 0 8px;
+  color: var(--color-text-muted);
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Форма входа по коду показывается вместо второй кнопки */
+.landing__join {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width: 400px) {
+  .landing__card {
+    padding: 24px 16px;
+  }
+
+  .landing__title {
+    font-size: 34px;
+  }
+}
