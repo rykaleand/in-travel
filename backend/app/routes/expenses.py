@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, request
 
 from ..schemas.expense import ExpenseRequest, ExpenseResponse
 from ..services import expense as expense_service
+from ..services import settlement as settlement_service
 from ..utils import error
 
 bp = Blueprint("expenses", __name__)
@@ -32,3 +33,12 @@ def add_expense(trip_id):
     except ValueError as e:
         return error(str(e), 400)
     return jsonify(ExpenseResponse.from_domain(expense).to_dict()), 201
+
+
+@bp.get("/trips/<int:trip_id>/balances")
+def get_balances(trip_id):
+    try:
+        result = settlement_service.get_trip_balances(trip_id)
+    except LookupError as e:
+        return error(str(e), 404)
+    return jsonify(result)
