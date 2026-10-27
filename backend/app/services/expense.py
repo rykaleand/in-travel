@@ -1,9 +1,16 @@
 # Сервис расходов: проверки входных данных и деление расхода на доли.
 # Ошибки данных -> ValueError (ответ 400), неизвестная поездка -> LookupError (ответ 404).
 # Владелец: Backend 2.
+import math
+
 from ..constants import EXPENSE_CATEGORIES
 from ..domain.expense import Expense, ExpenseShare
 from ..repositories import expense as expense_repository
+
+
+def _is_id(value):
+    """id участника — целое число. bool исключаем: в Python True == 1."""
+    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def split_amount(amount, count):
@@ -31,20 +38,34 @@ def create_expense(trip_id, request):
     # bool в Python тоже считается числом, поэтому исключаем его отдельно
     if not isinstance(request.amount, (int, float)) or isinstance(request.amount, bool):
         raise ValueError("Сумма должна быть числом")
-    amount = round(request.amount, 2)
+    try:
+        amount = float(request.amount)  # огромное целое не помещается во float -> OverflowError
+    except OverflowError:
+        raise ValueError("Сумма слишком большая")
+    if math.isnan(amount):
+        raise ValueError("Сумма должна быть числом")
+    # бесконечность или переполнение при переводе в копейки (amount * 100 в split_amount)
+    if not math.isfinite(amount) or not math.isfinite(amount * 100):
+        raise ValueError("Сумма слишком большая")
+    amount = round(amount, 2)
     if amount <= 0:
         raise ValueError("Сумма должна быть больше нуля")
 
     if request.category not in EXPENSE_CATEGORIES:
         raise ValueError("Категория должна быть одной из: " + ", ".join(EXPENSE_CATEGORIES))
 
-    trip_participant_ids = expense_repository.get_participant_ids(trip_id)
-    if request.payer_id not in trip_participant_ids:
-        raise ValueError("Плательщик должен быть участником этой поездки")
-
+    # Сначала проверяем типы и только потом идём в базу: иначе {} или [{}] уронят сервер (500)
+    if not _is_id(request.payer_id):
+        raise ValueError("payer_id должен быть целым числом")
     participant_ids = request.participant_ids
     if not isinstance(participant_ids, list) or not participant_ids:
         raise ValueError("Выберите хотя бы одного участника, между которыми делится расход")
+    if not all(_is_id(participant_id) for participant_id in participant_ids):
+        raise ValueError("participant_ids должен быть списком целых чисел")
+
+    trip_participant_ids = expense_repository.get_participant_ids(trip_id)
+    if request.payer_id not in trip_participant_ids:
+        raise ValueError("Плательщик должен быть участником этой поездки")
     if len(set(participant_ids)) != len(participant_ids):
         raise ValueError("Участники в списке не должны повторяться")
     for participant_id in participant_ids:

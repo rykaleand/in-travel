@@ -88,11 +88,32 @@ def test_participants_must_be_from_this_trip(client, trip, changes):
     {"category": "food"},
     {"participant_ids": []},
     {"participant_ids": [1, 1]},
+    # неверные типы: должно быть 400, а не 500
+    {"payer_id": {}},
+    {"payer_id": True},
+    {"payer_id": "1"},
+    {"payer_id": None},
+    {"participant_ids": [{}]},
+    {"participant_ids": [True, 2]},
+    {"participant_ids": ["1"]},
+    {"participant_ids": "1,2"},
 ])
 def test_invalid_data_returns_400(client, trip, changes):
     response = client.post(trip, json=make_expense(**changes))
     assert response.status_code == 400
     assert "error" in response.get_json()
+
+
+@pytest.mark.parametrize("raw_amount", [
+    "NaN", "Infinity", "-Infinity",
+    "1e308",          # сама сумма конечна, но amount * 100 уже переполняется
+    "1" + "0" * 400,  # огромное целое не помещается во float
+])
+def test_amount_must_be_finite(client, trip, raw_amount):
+    # такие значения можно отправить только «сырым» текстом JSON
+    body = '{"amount": %s, "category": "еда", "payer_id": 1, "participant_ids": [1]}' % raw_amount
+    response = client.post(trip, data=body, content_type="application/json")
+    assert response.status_code == 400
 
 
 def test_body_must_be_json(client, trip):
