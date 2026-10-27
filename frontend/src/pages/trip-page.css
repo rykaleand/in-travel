@@ -1,0 +1,155 @@
+/* Страница поездки: шапка, вкладки, содержимое. */
+
+.trip {
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+/* ---------- Шапка ---------- */
+
+.trip__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.trip__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.trip__back:hover {
+  background: var(--color-bg);
+}
+
+.trip__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  /* длинное название обрезаем, а не ломаем шапку */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.trip__share {
+  flex-shrink: 0;
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+.trip__share-hint {
+  margin: 0;
+  padding: 10px 16px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ---------- Вкладки ---------- */
+
+.trip__tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 8px;
+  overflow-x: auto; /* на узком экране вкладки прокручиваются вбок */
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.trip__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.trip__tab {
+  flex-shrink: 0;
+  padding: 12px 14px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.trip__tab:hover {
+  color: var(--color-text);
+}
+
+.trip__tab.is-active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.trip__tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+/* ---------- Содержимое вкладки ---------- */
+
+.trip__content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Заглушка пустой вкладки */
+.tab-stub {
+  padding: 48px 20px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.tab-stub__title {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.tab-stub__text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+/* ---------- Узкие экраны ---------- */
+
+@media (max-width: 480px) {
+  .trip__title {
+    font-size: 17px;
+  }
+
+  .trip__share {
+    padding: 0 12px;
+    font-size: 14px;
+  }
+
+  .trip__tab {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
