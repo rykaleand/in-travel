@@ -11,7 +11,7 @@ export async function request(path, options = {}) {
   }
   return data;
 }
-// Сохраняет билет поездки: PUT /trips/<id>/ticket. Возвращает { trip_id, ticket_link, flight_number, flight_time, aviasales },где aviasales это { origin, destination, day, month } или null.
+// Сохраняет билет поездки: PUT /trips/<id>/ticket.
 export function updateTicket(tripId, data) {
     return request(`/trips/${tripId}/ticket`, {
         method: "PUT",
@@ -21,5 +21,14 @@ export function updateTicket(tripId, data) {
             flight_number: data.flight_number ?? null,
             flight_time: data.flight_time ?? null,
         }),
+    });
+}
+// POST /trips: создать поездку по названию.
+// data: { name } — название поездки.
+export async function createTrip({ name }) {
+    return request("/trips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
     });
 }
