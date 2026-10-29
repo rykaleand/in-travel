@@ -1,9 +1,6 @@
 import pytest
-
 from app.extensions import db
 from app.models import ParticipantModel, TripModel
-from app.services.expense import split_amount
-
 
 @pytest.fixture()
 def trip(client):
@@ -130,6 +127,7 @@ def test_unknown_trip_returns_404(client, trip):
 
 @pytest.mark.parametrize("amount, count", [(100, 3), (10, 3), (0.05, 3), (1000, 7), (99.99, 2)])
 def test_split_amount_sum_matches(amount, count):
+    from app.services.expense import split_amount
     shares = split_amount(amount, count)
     assert len(shares) == count
     assert round(sum(shares), 2) == amount
