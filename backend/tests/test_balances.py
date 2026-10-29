@@ -25,7 +25,7 @@ def add_expense(client, amount, payer_id, participant_ids):
     })
     assert response.status_code == 201
 
-@pytest.mark.skip(reason="Расчёт балансов и переводов ещё не реализован (см. задачу #10)")
+
 def get_balances(client):
     """Возвращает ({id: баланс}, список переводов) и проверяет, что сумма балансов равна нулю."""
     response = client.get("/trips/1/balances")
