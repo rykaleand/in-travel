@@ -1,5 +1,5 @@
 import pytest
-@pytest.mark.skip(reason="Эндпоинт входа по ссылке ещё не реализован (см. задачу #7)")
+
 def test_get_trip_by_code(client):
     trip = client.post("/trips", json={"name": "Грузия"}).get_json()
     response = client.get(f"/trips/{trip['invite_code']}")
