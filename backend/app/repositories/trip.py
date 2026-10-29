@@ -39,3 +39,9 @@ def get_by_id(trip_id):
     """Одна поездка или None, если такой нет."""
     row = db.session.get(TripModel, trip_id)
     return _to_domain(row) if row else None
+
+def get_by_invite_code(code):
+    row = TripModel.query.filter_by(invite_code=code).first()
+    if row is None:
+        return None
+    return _to_domain(row)

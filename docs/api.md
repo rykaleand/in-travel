@@ -5,7 +5,7 @@
 | Метод | Путь | Что делает | Кто | Статус |
 |---|---|---|---|---|
 | POST | /trips | создать поездку | Backend 1 |готово | 
-| GET | /trips/<invite_code> | получить поездку по коду | Backend 1 | |
+| GET | /trips/<invite_code> | получить поездку по коду | Backend 1 | готово |
 | POST | /trips/<id>/participants | добавить участника | Backend 1 | |
 | GET | /trips/<id>/participants | список участников | Backend 1 | |
 | GET | /trips/<id>/stops | список точек маршрута | Backend 3 | готово |
@@ -73,6 +73,35 @@
 | `day_number` | число | номер дня поездки, от 1 |
 | `title` | строка | название точки |
 | `status` | строка | `proposed` (предложено) или `confirmed` (подтверждено) |
+
+## GET /trips/<invite_code>: вход по ссылке
+
+Возвращает поездку по коду приглашения. Участники заходят по ссылке вида `/trips/<invite_code>` без регистрации.
+
+**Запрос**
+
+Тела нет. Код приглашения передаётся в адресе: `GET /trips/avWrjn_nlxI`.
+
+**Ответ 200 OK**
+
+```json
+{
+"id": 1,
+"name": "Поездка в Казань",
+"invite_code": "avWrjn_nlxI",
+"ticket_link": null,
+"flight_number": null,
+"flight_time": null
+}
+```
+
+**Ошибка: 404 Not Found**
+
+Если поездки с таким кодом нет:
+
+```json
+{"error": "Поездка с таким кодом не найдена"}
+```
 
 ### GET /trips/<trip_id>/stops
 

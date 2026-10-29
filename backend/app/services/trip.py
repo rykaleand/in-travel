@@ -36,3 +36,6 @@ def create_trip(name):
         flight_time=None,
     )
     return trip_repository.create(trip)
+
+def get_trip_by_invite_code(code):
+    return trip_repository.get_by_invite_code(code)
