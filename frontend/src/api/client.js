@@ -11,3 +11,14 @@ export async function request(path, options = {}) {
   }
   return data;
 }
+
+// POST /trips: создать поездку по названию.
+// data: { name } — название поездки.
+// Возвращает созданную поездку: { id, name, invite_code, ... }.
+export async function createTrip({ name }) {
+  return request("/trips", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  });
+}
