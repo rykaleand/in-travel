@@ -11,14 +11,24 @@ export async function request(path, options = {}) {
   }
   return data;
 }
-
+// Сохраняет билет поездки: PUT /trips/<id>/ticket.
+export function updateTicket(tripId, data) {
+    return request(`/trips/${tripId}/ticket`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            ticket_link: data.ticket_link ?? null,
+            flight_number: data.flight_number ?? null,
+            flight_time: data.flight_time ?? null,
+        }),
+    });
+}
 // POST /trips: создать поездку по названию.
 // data: { name } — название поездки.
-// Возвращает созданную поездку: { id, name, invite_code, ... }.
 export async function createTrip({ name }) {
-  return request("/trips", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
-  });
+    return request("/trips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    });
 }
