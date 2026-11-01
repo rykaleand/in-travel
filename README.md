@@ -139,6 +139,12 @@ cd frontend
 npm install
 npm run dev                      # http://localhost:5173
 ```
+##  Запуск тестов
+```bash
+cd backend
+pip install -r requirements-dev.txt
+python -m pytest tests -q
+```
 
 Если порт 5000 занят (бывает на macOS): `PORT=5001 python run.py`.
 

@@ -2,12 +2,16 @@
 import pytest
 
 from app.repositories import trip as trip_repository
-from app.schemas.trip import TripResponse
 
 
 @pytest.fixture()
-def trip_id(client):
-    return client.post("/trips", json={"name": "Грузия"}).get_json()["id"]
+def trip(client):
+    return client.post("/trips", json={"name": "Грузия"}).get_json()
+
+
+@pytest.fixture()
+def trip_id(trip):
+    return trip["id"]
 
 
 def test_save_aviasales_ticket(client, trip_id):
@@ -29,22 +33,31 @@ def test_save_aviasales_ticket(client, trip_id):
     }
 
 
-def test_ticket_is_saved_in_trip(client, trip_id):
+def test_ticket_is_returned_with_trip(client, trip):
     client.put(
-        f"/trips/{trip_id}/ticket",
+        f"/trips/{trip['id']}/ticket",
         json={
             "ticket_link": "https://www.aviasales.com/search/MOW0209TBS1",
             "flight_number": "SU 1234",
             "flight_time": "2026-09-02T14:30:00",
         },
     )
-    # GET /trips/<invite_code> пока не готов (Backend 1), поэтому смотрим поездку через репозиторий:
-    # TripResponse — это то, что вернёт GET по коду
-    with client.application.app_context():
-        trip = TripResponse.from_domain(trip_repository.get_by_id(trip_id)).to_dict()
-    assert trip["ticket_link"] == "https://www.aviasales.com/search/MOW0209TBS1"
-    assert trip["flight_number"] == "SU 1234"
-    assert trip["flight_time"] == "2026-09-02T14:30:00"
+    # Так фронт получает поездку после обновления страницы
+    response = client.get(f"/trips/{trip['invite_code']}")
+    assert response.status_code == 200
+    saved = response.get_json()
+    assert saved["ticket_link"] == "https://www.aviasales.com/search/MOW0209TBS1"
+    assert saved["flight_number"] == "SU 1234"
+    assert saved["flight_time"] == "2026-09-02T14:30:00"
+    assert saved["aviasales"] == {"origin": "MOW", "destination": "TBS", "day": 2, "month": 9}
+
+
+def test_trip_without_aviasales_link(client, trip):
+    # Новая поездка без билета
+    assert trip["aviasales"] is None
+
+    client.put(f"/trips/{trip['id']}/ticket", json={"ticket_link": "https://www.s7.ru/booking/123"})
+    assert client.get(f"/trips/{trip['invite_code']}").get_json()["aviasales"] is None
 
 
 def test_other_site_link_is_saved_without_parsing(client, trip_id):
@@ -57,9 +70,12 @@ def test_other_site_link_is_saved_without_parsing(client, trip_id):
     assert ticket["aviasales"] is None
 
 
-def test_empty_ticket_clears_fields(client, trip_id):
+def test_empty_ticket_clears_fields(client, trip, trip_id):
     url = f"/trips/{trip_id}/ticket"
-    client.put(url, json={"ticket_link": "https://www.s7.ru/booking/123", "flight_number": "S7 1"})
+    client.put(
+        url,
+        json={"ticket_link": "https://www.aviasales.com/search/MOW0209TBS1", "flight_number": "S7 1"},
+    )
 
     response = client.put(url, json={"ticket_link": "", "flight_number": "   "})
     assert response.status_code == 200
@@ -70,6 +86,8 @@ def test_empty_ticket_clears_fields(client, trip_id):
         "flight_time": None,
         "aviasales": None,
     }
+    # После очистки разбора нет и в ответе поездки
+    assert client.get(f"/trips/{trip['invite_code']}").get_json()["aviasales"] is None
 
 
 @pytest.mark.parametrize(

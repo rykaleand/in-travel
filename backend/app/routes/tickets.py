@@ -14,9 +14,9 @@ def save_ticket(trip_id):
     try:
         # silent=True: если прислали не JSON, получим None, а не ошибку Flask
         ticket_request = TicketRequest.from_dict(request.get_json(silent=True))
-        trip, aviasales_info = ticket_service.save_ticket(trip_id, ticket_request)
+        trip = ticket_service.save_ticket(trip_id, ticket_request)
     except LookupError as error:
         return jsonify({"error": str(error)}), 404
     except ValueError as error:
         return jsonify({"error": str(error)}), 400
-    return jsonify(TicketResponse.from_domain(trip, aviasales_info).to_dict())
+    return jsonify(TicketResponse.from_domain(trip).to_dict())

@@ -3,6 +3,8 @@
 from ..domain.expense import Expense, ExpenseShare
 from ..extensions import db
 from ..models.expense import ExpenseModel, ExpenseShareModel
+from ..models.participant import ParticipantModel
+from ..models.trip import TripModel
 
 
 def _to_domain(row):
@@ -41,3 +43,21 @@ def create(expense):
     db.session.add(row)
     db.session.commit()
     return _to_domain(row)
+
+
+# Два вспомогательных запроса для проверок в сервисе расходов.
+# Когда Backend 1 сделает репозитории поездок и участников, их можно перенести туда.
+def trip_exists(trip_id):
+    return db.session.get(TripModel, trip_id) is not None
+
+
+def get_participant_ids(trip_id):
+    """Номера (id) всех участников поездки."""
+    rows = ParticipantModel.query.filter_by(trip_id=trip_id).all()
+    return {row.id for row in rows}
+
+
+def get_participant_names(trip_id):
+    """Участники поездки по порядку: {id: "Имя Фамилия"}."""
+    rows = ParticipantModel.query.filter_by(trip_id=trip_id).order_by(ParticipantModel.id).all()
+    return {row.id: f"{row.first_name} {row.last_name}" for row in rows}

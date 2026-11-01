@@ -1,22 +1,38 @@
 // Создание поездки: только название, участники добавляются на странице поездки.
 // Владелец: Frontend 1.
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import { createTrip } from "../api/client.js";
 
 export default function CreateTripPage() {
   const [name, setName] = useState("");
-  const [notice, setNotice] = useState("");
+  const [error, setError] = useState("");
+  // Отправка на сервер: на время неё блокируем кнопку, чтобы не создать две поездки.
+  const [sending, setSending] = useState(false);
+  const navigate = useNavigate();
 
-  // TODO (Frontend 1): когда Backend 1 сделает POST /trips, здесь нужно
-  // отправить название на сервер и перейти на /trip/<invite_code>.
-  function handleSubmit(event) {
-    event.preventDefault();
+  async function handleSubmit(event) {
+    event.preventDefault(); // чтобы страница не перезагрузилась
+
+    // Название проверяем по краям: одних пробелов недостаточно.
     const trimmed = name.trim();
     if (!trimmed) {
-      setNotice("Введите название поездки");
+      setError("Введите название поездки");
       return;
     }
-    setNotice("Создание поездки пока недоступно: ждём POST /trips от Backend 1.");
+
+    setSending(true);
+    setError("");
+    try {
+      // Сервер отвечает созданной поездкой: переходим на её страницу по коду приглашения.
+      const trip = await createTrip({ name: trimmed });
+      navigate(`/trip/${trip.invite_code}`);
+    } catch (e) {
+      // Название остаётся в поле — можно поправить и отправить снова.
+      setError(e.message); // текст ошибки от сервера
+      setSending(false);
+    }
   }
 
   return (
@@ -39,22 +55,28 @@ export default function CreateTripPage() {
             className="field__input"
             type="text"
             placeholder="например Грузия 2026"
+            maxLength={100}
             autoFocus
+            disabled={sending}
             value={name}
             onChange={(event) => {
               setName(event.target.value);
-              if (notice) setNotice("");
+              if (error) setError("");
             }}
           />
 
-          {notice && (
-            <p className="form__notice" role="status">
-              {notice}
+          {error && (
+            <p className="form__error" role="alert">
+              {error}
             </p>
           )}
 
-          <button type="submit" className="btn btn--primary btn--block">
-            Создать поездку
+          <button
+            type="submit"
+            className="btn btn--primary btn--block"
+            disabled={sending}
+          >
+            {sending ? "Создаём..." : "Создать поездку"}
           </button>
         </form>
       </div>

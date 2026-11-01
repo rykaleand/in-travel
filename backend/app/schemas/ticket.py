@@ -3,6 +3,8 @@
 from dataclasses import asdict, dataclass
 from typing import Optional
 
+from ..services.aviasales import get_aviasales_info
+
 
 @dataclass
 class TicketRequest:
@@ -31,14 +33,14 @@ class TicketResponse:
     aviasales: Optional[dict]  # разбор ссылки Aviasales или None
 
     @classmethod
-    def from_domain(cls, trip, aviasales):
-        """Собираем ответ из доменной модели Trip и разбора ссылки."""
+    def from_domain(cls, trip):
+        """Собираем ответ из доменной модели Trip. Ссылку разбираем так же, как в TripResponse."""
         return cls(
             trip_id=trip.id,
             ticket_link=trip.ticket_link,
             flight_number=trip.flight_number,
             flight_time=trip.flight_time.isoformat() if trip.flight_time else None,
-            aviasales=aviasales,
+            aviasales=get_aviasales_info(trip.ticket_link),
         )
 
     def to_dict(self):

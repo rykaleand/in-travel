@@ -25,3 +25,11 @@ def create_trip():
         return jsonify({"error": str(e)}), 400
 
     return jsonify(TripResponse.from_domain(trip).to_dict()), 201
+
+@bp.get("/trips/<invite_code>")
+def get_trip_by_code(invite_code):
+    trip = trip_service.get_trip_by_invite_code(invite_code)
+    if trip is None:
+        return jsonify({"error": "Поездка с таким кодом не найдена"}), 404
+
+    return jsonify(TripResponse.from_domain(trip).to_dict())

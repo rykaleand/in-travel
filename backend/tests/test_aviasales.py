@@ -1,7 +1,7 @@
 # Тесты разбора ссылки Aviasales (приложение Б ТЗ). Flask здесь не нужен: проверяем функцию напрямую.
 import pytest
 
-from app.services.aviasales import parse_aviasales_link
+from app.services.aviasales import get_aviasales_info, parse_aviasales_link
 
 
 @pytest.mark.parametrize(
@@ -51,3 +51,25 @@ def test_other_site_is_not_parsed():
 def test_parse_incorrect_link(link):
     with pytest.raises(ValueError):
         parse_aviasales_link(link)
+
+
+def test_info_for_correct_link():
+    assert get_aviasales_info("https://www.aviasales.com/search/MOW0209TBS1") == {
+        "origin": "MOW",
+        "destination": "TBS",
+        "day": 2,
+        "month": 9,
+    }
+
+
+@pytest.mark.parametrize(
+    "link",
+    [
+        None,  # билета нет
+        "",
+        "https://www.s7.ru/ru/booking/12345",  # другой сайт
+        "https://www.aviasales.com/search/abc",  # неверная ссылка: ошибки нет, просто None
+    ],
+)
+def test_info_without_parsing(link):
+    assert get_aviasales_info(link) is None

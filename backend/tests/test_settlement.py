@@ -19,3 +19,13 @@ def test_total_transferred_equals_total_debt():
     balances = {"A": 120.5, "B": -40.25, "C": -80.25}
     result = calculate_settlements(balances)
     assert round(sum(t[2] for t in result), 2) == 120.5
+
+
+def test_example_from_paper():
+    result = calculate_settlements({"Иван": -500, "Мария": 400, "Пётр": 100})
+    assert result == [("Иван", "Мария", 400), ("Иван", "Пётр", 100)]
+
+
+def test_chain_becomes_one_transfer():
+    # А должен Б, а Б должен В столько же: Б в нуле, хватает одного перевода А -> В
+    assert calculate_settlements({"А": -100, "Б": 0, "В": 100}) == [("А", "В", 100)]

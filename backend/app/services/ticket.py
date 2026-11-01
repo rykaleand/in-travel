@@ -41,23 +41,22 @@ def _parse_flight_time(text):
 def save_ticket(trip_id, request):
     """Проверяет данные из TicketRequest и сохраняет билет поездки.
 
-    Возвращает пару: поездку и разбор ссылки Aviasales (или None).
+    Возвращает поездку с сохранённым билетом.
     PUT заменяет билет целиком: поле, которое не прислали, станет пустым.
     """
     if trip_repository.get_by_id(trip_id) is None:
         raise LookupError("Поездка не найдена")
 
     ticket_link = _clean_text(request.ticket_link, "Ссылка на билет должна быть строкой")
-    aviasales_info = None
     if ticket_link is not None:
         _check_link(ticket_link)
-        # Для ссылки Aviasales достаём направление и дату, другие сайты не разбираем
-        aviasales_info = aviasales.parse_aviasales_link(ticket_link)
+        # Неверная ссылка Aviasales даст ValueError, и билет не сохранится.
+        # Сам разбор для ответа делает TicketResponse
+        aviasales.parse_aviasales_link(ticket_link)
 
     flight_number = _clean_text(request.flight_number, "Номер рейса должен быть строкой")
 
     flight_time_text = _clean_text(request.flight_time, "Время рейса должно быть строкой")
     flight_time = _parse_flight_time(flight_time_text) if flight_time_text else None
 
-    trip = trip_repository.update_ticket(trip_id, ticket_link, flight_number, flight_time)
-    return trip, aviasales_info
+    return trip_repository.update_ticket(trip_id, ticket_link, flight_number, flight_time)

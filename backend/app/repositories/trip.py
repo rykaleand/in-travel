@@ -50,3 +50,9 @@ def update_ticket(trip_id, ticket_link, flight_number, flight_time):
     row.flight_time = flight_time
     db.session.commit()
     return _to_domain(row)
+
+def get_by_invite_code(code):
+    row = TripModel.query.filter_by(invite_code=code).first()
+    if row is None:
+        return None
+    return _to_domain(row)

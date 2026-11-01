@@ -59,3 +59,17 @@ def parse_aviasales_link(link):
         raise ValueError(FORMAT_ERROR)
 
     return {"origin": origin, "destination": destination, "day": day, "month": month}
+
+
+def get_aviasales_info(link):
+    """Разбор сохранённой ссылки для ответа: направление и дата или None.
+
+    В отличие от parse_aviasales_link, никогда не бросает ошибку: ответ с поездкой
+    не должен ломаться из-за ссылки. Неверную ссылку Aviasales PUT /ticket и так не сохранит.
+    """
+    if not link:
+        return None
+    try:
+        return parse_aviasales_link(link)
+    except ValueError:
+        return None
