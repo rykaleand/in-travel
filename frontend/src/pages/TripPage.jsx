@@ -1,8 +1,10 @@
 // Страница поездки: шапка с названием и кнопкой «Поделиться», ниже 5 вкладок.
 // Вкладки пока пустые — их наполняют свои роли (см. таблицу в README.md).
 // Владелец: Frontend 1.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { getTripByCode } from "../api/client";
+import TicketsTab from "../components/tickets/TicketsTab";
 
 import "./trip-page.css";
 
@@ -21,10 +23,44 @@ export default function TripPage() {
   const [activeTab, setActiveTab] = useState("participants");
   const [shareHint, setShareHint] = useState("");
 
-  // TODO (Frontend 1): когда Backend 1 сделает GET /trips/<invite_code>,
-  // здесь нужно загрузить название поездки и показать состояния
-  // «загрузка / ошибка / успех». Пока показываем код из адреса.
-  const tripName = invite_code;
+    const [trip, setTrip] = useState(null);
+    const [loadError, setLoadError] = useState("");
+
+    useEffect(() => {
+        let cancelled = false; // если код сменился или страницу закрыли, старый ответ игнорируем
+        setTrip(null);
+        setLoadError("");
+        getTripByCode(invite_code)
+            .then((data) => {
+                if (!cancelled) setTrip(data);
+            })
+            .catch((err) => {
+                if (!cancelled) {
+                    setLoadError(
+                        err.message === "Failed to fetch"
+                            ? "Не удалось связаться с сервером"
+                            : err.message
+                    );
+                }
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [invite_code]);
+
+    const tripName = trip ? trip.name : invite_code;
+
+    function handleTicketSaved(ticket) {
+        setTrip((prev) => ({
+            ...prev,
+            ticket_link: ticket.ticket_link,
+            flight_number: ticket.flight_number,
+            flight_time: ticket.flight_time,
+            aviasales: ticket.aviasales,
+        }));
+    }
+
+
 
   const currentTab = TABS.find((tab) => tab.id === activeTab);
 
@@ -75,14 +111,23 @@ export default function TripPage() {
       </nav>
 
       {/* Содержимое выбранной вкладки */}
-      <section className="trip__content" role="tabpanel">
-        <div className="tab-stub">
-          <p className="tab-stub__title">{currentTab.label}</p>
-          <p className="tab-stub__text">
-            Раздел в разработке. Отвечает: {currentTab.owner}.
-          </p>
-        </div>
-      </section>
+        <section className="trip__content" role="tabpanel">
+            {loadError ? (
+                <div className="tab-stub">
+                    <p className="tab-stub__title">Не удалось загрузить поездку</p>
+                    <p className="tab-stub__text">{loadError}</p>
+                </div>
+            ) : activeTab === "tickets" ? (
+                <TicketsTab trip={trip} onTicketSaved={handleTicketSaved} />
+            ) : (
+                <div className="tab-stub">
+                    <p className="tab-stub__title">{currentTab.label}</p>
+                    <p className="tab-stub__text">
+                        Раздел в разработке. Отвечает: {currentTab.owner}.
+                    </p>
+                </div>
+            )}
+        </section>
     </div>
   );
 }
