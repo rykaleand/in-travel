@@ -1,5 +1,3 @@
-import pytest
-
 def test_get_trip_by_code(client):
     trip = client.post("/trips", json={"name": "Грузия"}).get_json()
     response = client.get(f"/trips/{trip['invite_code']}")
@@ -9,7 +7,6 @@ def test_get_trip_by_code(client):
 def test_unknown_invite_code_returns_404(client):
     assert client.get("/trips/nope").status_code == 404
 
-@pytest.mark.skip(reason="API участников (добавление/список) ещё не реализован (см. задачу #47)")
 def test_add_and_list_participants(client):
     trip = client.post("/trips", json={"name": "Тест"}).get_json()
     url = f"/trips/{trip['id']}/participants"
@@ -20,7 +17,6 @@ def test_add_and_list_participants(client):
     participants = client.get(url).get_json()
     assert [p["first_name"] for p in participants] == ["Анна"]
 
-@pytest.mark.skip(reason="API участников (добавление/список) ещё не реализован (см. задачу #47)")
 def test_participant_requires_both_names(client):
     trip = client.post("/trips", json={"name": "Тест"}).get_json()
     response = client.post(
