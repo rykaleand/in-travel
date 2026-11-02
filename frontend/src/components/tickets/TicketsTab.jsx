@@ -7,19 +7,21 @@ import TicketInfo from "./TicketInfo";
 import TicketForm from "./TicketForm";
 import "./tickets.css";
 
-
-export default function TicketsTab({ trip }) {
-    const [savedTicket, setSavedTicket] = useState(null);
+export default function TicketsTab({ trip, onTicketSaved }) {
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState("");
 
-    // Поездка ещё не загрузилась (страница передаёт null)
     if (!trip) {
-        return <p className="tickets-message">Загрузка...</p>;
+        return (
+            <section className="tickets-tab">
+                <div className="tickets-state">
+                    <div className="spinner" />
+                    <p>Загрузка...</p>
+                </div>
+            </section>
+        );
     }
-
-    const ticket = savedTicket ?? trip;
 
     function openForm() {
         setError("");
@@ -36,7 +38,7 @@ export default function TicketsTab({ trip }) {
         setError("");
         try {
             const result = await updateTicket(trip.id, values);
-            setSavedTicket(result);
+            onTicketSaved(result);
             setIsEditing(false);
         } catch (err) {
             setError(
@@ -51,22 +53,27 @@ export default function TicketsTab({ trip }) {
 
     return (
         <section className="tickets-tab">
-            <h2>Билеты</h2>
-            {isEditing ? (
-                <TicketForm
-                    initialValues={{
-                        ticket_link: ticket.ticket_link ?? "",
-                        flight_number: ticket.flight_number ?? "",
-                        flight_time: (ticket.flight_time ?? "").slice(0, 16),
-                    }}
-                    isSaving={isSaving}
-                    error={error}
-                    onSave={handleSave}
-                    onCancel={closeForm}
-                />
-            ) : (
-                <TicketInfo ticket={ticket} onEdit={openForm} />
-            )}
+            <div className="tickets-tab__header">
+                <h2 className="tickets-tab__title">Билеты</h2>
+            </div>
+
+            <div className="tickets-card">
+                {isEditing ? (
+                    <TicketForm
+                        initialValues={{
+                            ticket_link: trip.ticket_link ?? "",
+                            flight_number: trip.flight_number ?? "",
+                            flight_time: (trip.flight_time ?? "").slice(0, 16),
+                        }}
+                        isSaving={isSaving}
+                        error={error}
+                        onSave={handleSave}
+                        onCancel={closeForm}
+                    />
+                ) : (
+                    <TicketInfo ticket={trip} onEdit={openForm} />
+                )}
+            </div>
         </section>
     );
 }
