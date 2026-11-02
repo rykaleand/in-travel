@@ -33,3 +33,29 @@ def create_stop(trip_id):
     except ValueError as error:
         return jsonify({"error": str(error)}), 400
     return jsonify(RouteStopResponse.from_domain(stop).to_dict()), 201
+
+
+@bp.put("/stops/<int:stop_id>")
+def update_stop(stop_id):
+    # Как в POST: не JSON превращаем в пустой словарь, а сервис скажет, что полей нет
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        data = {}
+    stop_request = RouteStopRequest.from_dict(data)
+
+    try:
+        stop = route_stop_service.update_stop(stop_id, stop_request)
+    except LookupError as error:
+        return jsonify({"error": str(error)}), 404
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+    return jsonify(RouteStopResponse.from_domain(stop).to_dict())
+
+
+@bp.delete("/stops/<int:stop_id>")
+def delete_stop(stop_id):
+    try:
+        route_stop_service.delete_stop(stop_id)
+    except LookupError as error:
+        return jsonify({"error": str(error)}), 404
+    return jsonify({"success": True})
