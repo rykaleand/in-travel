@@ -1,0 +1,59 @@
+/* Цветовые токены дизайна «ВПуть» (макеты: docs/design/README.md).
+   ВАЖНО: имена --color-primary, --color-primary-hover, --color-primary-soft, --color-success,
+   --color-text, --color-text-muted и --color-border уже есть в style.css с другими значениями.
+   Пока файл НЕ подключён в main.jsx. Когда команда решит перейти на новую палитру,
+   подключите его после style.css и поправьте места, где --color-success используется как цвет текста
+   (для текста берите --color-success-strong). */
+:root {
+  /* Основной (brand) */
+  --color-primary: #1b5583;
+  --color-primary-hover: #164a73;
+  --color-primary-active: #103a5a;
+  --color-primary-soft: #9aceeb;
+  --color-primary-faint: #e1f1fa;
+  --color-accent: #0091e6;
+  /* Нейтральные (серые) */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #f5f7f9;
+  --color-neutral-100: #eceff2;
+  --color-neutral-200: #dde2e7;
+  --color-neutral-300: #c3cbd3;
+  --color-neutral-400: #9aa5b1;
+  --color-neutral-600: #5b6672;
+  --color-neutral-900: #000000;
+  /* Успех (success) */
+  --color-success: #84d784;
+  --color-success-bg: #addfad;
+  --color-success-strong: #2e7d32;
+  /* Ошибка (error) */
+  --color-error: #cd5c5c;
+  --color-error-hover: #b94a4a;
+  --color-error-bg: #f7dfdf;
+  --color-error-strong: #a93c3c;
+  /* Предупреждение (warning) */
+  --color-warning: #fcd975;
+  --color-warning-bg: #fff4d1;
+  --color-warning-strong: #8a5a00;
+  /* Информация (info) */
+  --color-info: #0091e6;
+  --color-info-bg: #e1f1fa;
+  --color-info-strong: #00689f;
+  /* Алиасы для компонентов */
+  --color-text: #000000;
+  --color-text-muted: #5b6672;
+  --color-text-disabled: #9aa5b1;
+  --color-text-on-primary: #ffffff;
+  --color-bg-page: #f5f7f9;
+  --color-bg-surface: #ffffff;
+  --color-bg-disabled: #eceff2;
+  --color-border: #dde2e7;
+  --color-border-strong: #c3cbd3;
+  --color-divider: #eceff2;
+  --color-focus-ring: #0091e6;
+  /* Скругление-таблетка (остальные радиусы и шрифт Inter уже в style.css) */
+  --radius-pill: 999px;
+  /* Шрифт для крупных заголовков */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  /* Фокус */
+  --focus-shadow: 0 0 0 3px rgba(0, 145, 230, 0.35);
+}
