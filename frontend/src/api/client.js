@@ -32,3 +32,7 @@ export async function createTrip({ name }) {
         body: JSON.stringify({ name }),
     });
 }
+
+export function getTripByCode(inviteCode) {
+    return request(`/trips/${inviteCode}`);
+}
