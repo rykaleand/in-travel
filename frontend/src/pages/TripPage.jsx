@@ -77,9 +77,9 @@ export default function TripPage() {
             case "tickets":
                 return <TicketsTab trip={trip} onTicketSaved={handleTicketSaved} />;
             case "budget":
-                return <BudgetTab trip={trip} />;
+                return <BudgetTab tripId={trip.id} />;
             case "checklist":
-                return <ChecklistTab trip={trip} />;
+                return <ChecklistTab tripId={trip.id} />;
             default: {
                 const tab = TABS.find((item) => item.id === activeTab);
                 return (
