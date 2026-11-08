@@ -2,6 +2,8 @@
 # Неверные данные -> ValueError (контроллер ответит 400),
 # поездки или точки нет -> LookupError (контроллер ответит 404).
 # Владелец: Backend 3.
+import math
+
 from ..constants import STOP_STATUS_PROPOSED, STOP_STATUSES
 from ..repositories import route_stop as route_stop_repository
 from ..repositories import trip as trip_repository
@@ -38,6 +40,24 @@ def _check_status(status):
     return status
 
 
+def _check_coordinates(request):
+    # Координаты задаются и очищаются только парой; ноль — допустимое значение.
+    if request.latitude_provided != request.longitude_provided:
+        raise ValueError("Передайте latitude и longitude вместе")
+    latitude, longitude = request.latitude, request.longitude
+    if latitude is None and longitude is None:
+        return None, None
+    for name, value, limit in (("latitude", latitude, 90), ("longitude", longitude, 180)):
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, (int, float))
+            or not -limit <= value <= limit
+            or not math.isfinite(value)
+        ):
+            raise ValueError(f"{name} должна быть числом от {-limit} до {limit}")
+    return float(latitude), float(longitude)
+
+
 def create_stop(trip_id, request):
     """Проверяет данные из RouteStopRequest и сохраняет новую точку."""
     _check_trip_exists(trip_id)
@@ -47,21 +67,24 @@ def create_stop(trip_id, request):
     # Статус необязательный: если не прислали, точка просто предложена
     status = _check_status(request.status if request.status is not None else STOP_STATUS_PROPOSED)
 
-    return route_stop_repository.create(trip_id, day_number, title, status)
+    latitude, longitude = _check_coordinates(request)
+    return route_stop_repository.create(trip_id, day_number, title, status, latitude, longitude)
 
 
 def update_stop(stop_id, request):
     """Меняет переданные поля точки, остальные оставляет как были.
 
-    Поле со значением None считается не переданным.
+    Для названия, дня и статуса None считается не переданным.
+    Координаты пропущены — сохраняем; обе None — очищаем.
     Точки нет -> LookupError, неверные данные -> ValueError.
     """
     stop = route_stop_repository.get_by_id(stop_id)
     if stop is None:
         raise LookupError("Точка маршрута не найдена")
 
-    if request.title is None and request.day_number is None and request.status is None:
-        raise ValueError("Передайте хотя бы одно поле: title, day_number или status")
+    if (request.title is None and request.day_number is None and request.status is None
+            and not request.latitude_provided and not request.longitude_provided):
+        raise ValueError("Передайте хотя бы одно поле: title, day_number, status или пару latitude и longitude")
 
     # Не прислали поле -> берём текущее значение точки
     title = _check_title(request.title) if request.title is not None else stop.title
@@ -72,7 +95,12 @@ def update_stop(stop_id, request):
     )
     status = _check_status(request.status) if request.status is not None else stop.status
 
-    return route_stop_repository.update(stop_id, day_number, title, status)
+    latitude, longitude = (
+        _check_coordinates(request)
+        if request.latitude_provided or request.longitude_provided
+        else (stop.latitude, stop.longitude)
+    )
+    return route_stop_repository.update(stop_id, day_number, title, status, latitude, longitude)
 
 
 def delete_stop(stop_id):

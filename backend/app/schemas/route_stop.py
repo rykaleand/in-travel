@@ -8,6 +8,10 @@ class RouteStopRequest:
     day_number: Optional[int]
     title: Optional[str]
     status: Optional[str]
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    latitude_provided: bool = False
+    longitude_provided: bool = False
 
     @classmethod
     def from_dict(cls, data):
@@ -16,6 +20,10 @@ class RouteStopRequest:
             day_number=data.get("day_number"),
             title=data.get("title"),
             status=data.get("status"),
+            latitude=data.get("latitude"),
+            longitude=data.get("longitude"),
+            latitude_provided="latitude" in data,
+            longitude_provided="longitude" in data,
         )
 
 
@@ -26,6 +34,8 @@ class RouteStopResponse:
     day_number: int
     title: str
     status: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
     @classmethod
     def from_domain(cls, stop):
@@ -36,6 +46,8 @@ class RouteStopResponse:
             day_number=stop.day_number,
             title=stop.title,
             status=stop.status,
+            latitude=stop.latitude,
+            longitude=stop.longitude,
         )
 
     def to_dict(self):

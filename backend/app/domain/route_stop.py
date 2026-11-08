@@ -9,3 +9,5 @@ class RouteStop:
     day_number: int
     title: str
     status: str  # "proposed" или "confirmed", см. constants.py
+    latitude: float | None = None
+    longitude: float | None = None

@@ -13,3 +13,6 @@ class RouteStopModel(db.Model):
     day_number = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(20), nullable=False, default=STOP_STATUS_PROPOSED)
+
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
