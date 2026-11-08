@@ -1,0 +1,22 @@
+.location-picker {
+  min-width: 0;
+}
+
+.location-picker > p {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.location-picker__map {
+  /* Без высоты Leaflet не отображается. Локальный контекст не перекрывает шапку/модалку. */
+  height: 300px;
+  width: 100%;
+  isolation: isolate;
+  z-index: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg);
+}
+
+.location-picker > button {
+  margin-top: 8px;
+}
