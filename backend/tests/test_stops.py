@@ -29,7 +29,7 @@ def test_list_stops_sorted_by_day_then_id(client, trip_id):
 
     stops = client.get(url).get_json()
     assert [s["title"] for s in stops] == ["Аэропорт", "Старый город", "Мцхета"]
-    assert set(stops[0]) == {"id", "trip_id", "day_number", "title", "status"}
+    assert set(stops[0]) == {"id", "trip_id", "day_number", "title", "status", "latitude", "longitude"}
 
 
 def test_create_stop_default_status(client, trip_id):
@@ -116,6 +116,8 @@ def test_update_all_fields(client, trip_id, stop):
         "day_number": 3,
         "title": "Мцхета",
         "status": "confirmed",
+        "latitude": None,
+        "longitude": None,
     }
     assert response.get_json() == expected
     # Изменения сохранились: их видно в списке точек
@@ -181,7 +183,7 @@ def test_update_stop_not_json(client, stop):
     response = client.put(f"/stops/{stop['id']}", data="не json")
     assert response.status_code == 400
     assert response.get_json() == {
-        "error": "Передайте хотя бы одно поле: title, day_number или status"
+        "error": "Передайте хотя бы одно поле: title, day_number, status или пару latitude и longitude"
     }
 
 

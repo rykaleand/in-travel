@@ -13,6 +13,8 @@ def _to_domain(row):
         day_number=row.day_number,
         title=row.title,
         status=row.status,
+        latitude=row.latitude,
+        longitude=row.longitude,
     )
 
 
@@ -32,16 +34,17 @@ def get_by_id(stop_id):
     return _to_domain(row) if row else None
 
 
-def create(trip_id, day_number, title, status=STOP_STATUS_PROPOSED):
+def create(trip_id, day_number, title, status=STOP_STATUS_PROPOSED, latitude=None, longitude=None):
     row = RouteStopModel(
-        trip_id=trip_id, day_number=day_number, title=title, status=status
+        trip_id=trip_id, day_number=day_number, title=title, status=status,
+        latitude=latitude, longitude=longitude
     )
     db.session.add(row)
     db.session.commit()
     return _to_domain(row)
 
 
-def update(stop_id, day_number, title, status):
+def update(stop_id, day_number, title, status, latitude, longitude):
     """Меняет поля точки. Возвращает обновлённую точку или None, если её нет."""
     row = db.session.get(RouteStopModel, stop_id)
     if row is None:
@@ -49,6 +52,8 @@ def update(stop_id, day_number, title, status):
     row.day_number = day_number
     row.title = title
     row.status = status
+    row.latitude = latitude
+    row.longitude = longitude
     db.session.commit()
     return _to_domain(row)
 
