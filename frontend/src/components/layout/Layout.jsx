@@ -43,13 +43,23 @@ export default function Layout({ title, tabs, activeTab, onTabChange, children }
                     <Icon name="menu" />
                 </button>
 
-                <Link to="/" className="layout-header__icon-btn" aria-label="На главную">
-                    ←
-                </Link>
-
+                <img
+                    className="layout-header__logo"
+                    src="/apple-touch-icon.png"
+                    alt=""
+                    width="32"
+                    height="32"
+                />
                 <h1 className="layout-header__title">{title}</h1>
-
                 <div className="layout-header__actions">
+                    <Link
+                        to="/"
+                        className="layout-header__icon-btn"
+                        aria-label="На главную"
+                        data-tooltip="На главную"
+                    >
+                        <Icon name="back" />
+                    </Link>
                     <button type="button" className="btn btn--secondary" onClick={handleShare}>
                         Поделиться
                     </button>

@@ -1,6 +1,7 @@
 // иконки для навигации без сторонних библиотек.
 const PATHS = {
     menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+    back: <path d="M19 12H5M12 19l-7-7 7-7" />,
     route: (
         <>
             <circle cx="6" cy="6" r="2" />
