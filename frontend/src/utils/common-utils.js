@@ -18,3 +18,12 @@ export function getInitials(participant) {
   const last = participant.last_name?.[0] || "";
   return (first + last).toUpperCase();
 }
+
+// Проверяем, что сервер прислал список. Иначе бросаем понятную ошибку,
+// чтобы вкладка показала «Попробовать снова», а не сломалась.
+export function ensureArray(value) {
+  if (!Array.isArray(value)) {
+    throw new Error("Сервер прислал данные в неожиданном формате");
+  }
+  return value;
+}

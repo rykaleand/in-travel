@@ -1,9 +1,7 @@
 /* Цветовые токены дизайна «ВПуть» (макеты: docs/design/README.md).
-   ВАЖНО: имена --color-primary, --color-primary-hover, --color-primary-soft, --color-success,
-   --color-text, --color-text-muted и --color-border уже есть в style.css с другими значениями.
-   Пока файл НЕ подключён в main.jsx. Когда команда решит перейти на новую палитру,
-   подключите его после style.css и поправьте места, где --color-success используется как цвет текста
-   (для текста берите --color-success-strong). */
+   Подключается в main.jsx перед style.css. Старые названия цветов (--color-bg, --color-danger и др.)
+   объявлены в style.css как ссылки на эти токены.
+   --color-success светлый, для текста берите --color-success-strong. */
 :root {
   /* Основной (brand) */
   --color-primary: #1b5583;
@@ -50,7 +48,7 @@
   --color-border-strong: #c3cbd3;
   --color-divider: #eceff2;
   --color-focus-ring: #0091e6;
-  /* Скругление-таблетка (остальные радиусы и шрифт Inter уже в style.css) */
+  /* Скругление-таблетка (остальные радиусы и шрифт Inter в style.css) */
   --radius-pill: 999px;
   /* Шрифт для крупных заголовков */
   --font-display: 'Cormorant Garamond', Georgia, serif;

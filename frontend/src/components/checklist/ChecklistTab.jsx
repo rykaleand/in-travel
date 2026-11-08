@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { addChecklistItem, getChecklist, toggleChecklistItem } from "../../api/checklist-client.js";
 import AddChecklistForm from "./AddChecklistForm.jsx";
 import ChecklistList from "./ChecklistList.jsx";
+import { ensureArray } from "../../utils/common-utils.js";
 import "./checklist.css";
 
 // tripId передаёт страница поездки (TripPage, Frontend 1).
@@ -22,12 +23,23 @@ export default function ChecklistTab({ tripId }) {
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    // Если tripId сменился или вкладку закрыли, ответ старого запроса игнорируем.
+    let ignore = false;
     setLoading(true);
     setError("");
     getChecklist(tripId)
-      .then(setItems)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (!ignore) setItems(ensureArray(data));
+      })
+      .catch((e) => {
+        if (!ignore) setError(e.message);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
   }, [tripId, reloadKey]);
 
   // Вызывает форма. Ошибку не ловим здесь: форма сама покажет её под полем.
@@ -64,7 +76,7 @@ export default function ChecklistTab({ tripId }) {
   if (error) {
     return (
       <div className="checklist-tab">
-        <div className="checklist-state checklist-state--error" role="alert">
+        <div className="checklist-state checklist-state--error state-error-icon" role="alert">
           <p>Не получилось загрузить чек-лист: {error}</p>
           <button type="button" className="btn btn--secondary" onClick={() => setReloadKey((k) => k + 1)}>
             Попробовать снова

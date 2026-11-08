@@ -58,6 +58,7 @@ export default function CreateTripPage() {
             maxLength={100}
             autoFocus
             disabled={sending}
+            aria-invalid={Boolean(error)}
             value={name}
             onChange={(event) => {
               setName(event.target.value);

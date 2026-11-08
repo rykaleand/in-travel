@@ -22,16 +22,17 @@ body {
 
 /* ---------- Кнопки ---------- */
 
+/* Кнопки по UI-киту (docs/design/colors-and-components.md): высота 44 px, радиус 10 px, шрифт 14 Medium */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
+  min-height: 44px;
   padding: 0 20px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   font-family: inherit;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
@@ -43,13 +44,47 @@ body {
   color: var(--color-on-primary);
 }
 
-.btn--primary:hover {
+.btn--primary:hover:not(:disabled) {
   background: var(--color-primary-hover);
 }
 
+.btn--primary:active:not(:disabled) {
+  background: var(--color-primary-active);
+}
+
+/* Второстепенная кнопка по UI-киту: белая с рамкой */
 .btn--secondary {
-  background: var(--color-primary-soft);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg-surface);
+  color: var(--color-text);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  border-color: var(--color-neutral-400);
+  background: var(--color-neutral-50);
+}
+
+.btn--secondary:active:not(:disabled) {
+  background: var(--color-neutral-100);
+}
+
+/* Текстовая кнопка по UI-киту: без фона, синий текст */
+.btn--text {
+  background: transparent;
   color: var(--color-primary);
+}
+
+.btn--text:hover:not(:disabled) {
+  background: var(--color-primary-faint);
+}
+
+.btn--text:active:not(:disabled) {
+  background: var(--color-primary-soft);
+}
+
+.btn--text:disabled {
+  border-color: transparent;
+  background: transparent;
 }
 
 .btn--block {
@@ -58,13 +93,14 @@ body {
 
 /* Кнопка во время отправки формы: кликнуть по ней нельзя */
 .btn:disabled {
-  opacity: 0.55;
+  border-color: var(--color-border);
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
   cursor: not-allowed;
 }
 
-.btn:focus-visible,
-.field__input:focus-visible {
-  outline: 2px solid var(--color-primary);
+.btn:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -77,9 +113,9 @@ body {
 
 .field__input {
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   padding: 0 16px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-text);
@@ -89,8 +125,9 @@ body {
 
 .field__input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  /* фокус по UI-киту: рамка accent 2 px и мягкое кольцо */
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent), var(--focus-shadow);
 }
 
 .form {
@@ -104,7 +141,7 @@ body {
   margin: 0;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  background: var(--color-primary-soft);
+  background: var(--color-primary-faint);
   color: var(--color-text);
   font-size: 14px;
 }
@@ -117,6 +154,50 @@ body {
   background: var(--color-danger-soft);
   color: var(--color-danger);
   font-size: 14px;
+}
+
+/* Плейсхолдеры всех полей */
+input::placeholder {
+  color: var(--color-text-disabled);
+}
+
+/* Поле с ошибкой по UI-киту: красная рамка (форма ставит aria-invalid) */
+input[aria-invalid="true"],
+input[aria-invalid="true"]:focus {
+  border-color: var(--color-error);
+  box-shadow: inset 0 0 0 1px var(--color-error);
+}
+
+/* Неактивное поле */
+input:disabled {
+  background: var(--color-bg-disabled);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Сообщения об ошибках по UI-киту: текст error-strong на фоне error-bg и иконка.
+   Иконка error.svg берётся как маска и красится в цвет текста. */
+.form__error,
+.expense-form__error,
+.checklist-error,
+.ticket-form__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.form__error::before,
+.expense-form__error::before,
+.checklist-error::before,
+.ticket-form__error::before,
+.state-error-icon::before {
+  content: "";
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  -webkit-mask: url("../assets/icons/error.svg") center / contain no-repeat;
+  mask: url("../assets/icons/error.svg") center / contain no-repeat;
 }
 
 /* ---------- Простая страница с карточкой ---------- */
