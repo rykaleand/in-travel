@@ -45,13 +45,18 @@ export default function TripPage() {
     }, [invite_code, reloadKey]);
 
     function handleTicketSaved(ticket) {
-        setTrip((prev) => ({
-            ...prev,
-            ticket_link: ticket.ticket_link,
-            flight_number: ticket.flight_number,
-            flight_time: ticket.flight_time,
-            aviasales: ticket.aviasales,
-        }));
+        setTrip((prev) => {
+            // Ответ предыдущей поездки не должен менять текущую или ещё загружающуюся.
+            if (!prev || prev.id !== ticket.trip_id) return prev;
+
+            return {
+                ...prev,
+                ticket_link: ticket.ticket_link,
+                flight_number: ticket.flight_number,
+                flight_time: ticket.flight_time,
+                aviasales: ticket.aviasales,
+            };
+        });
     }
 
     function renderContent() {
