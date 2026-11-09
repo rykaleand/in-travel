@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage.jsx";
 import CreateTripPage from "./pages/CreateTripPage.jsx";
 import TripPage from "./pages/TripPage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 export default function App() {
   return (
@@ -16,6 +17,8 @@ export default function App() {
         <Route path="/trip/new" element={<CreateTripPage />} />
         {/* страница поездки: код приглашения берём из адреса */}
         <Route path="/trip/:invite_code" element={<TripPage />} />
+        {/* всё остальное: показываем «Страница не найдена», а не пустой экран */}
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

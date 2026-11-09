@@ -8,16 +8,21 @@ import "../styles/landing.css";
 export default function LandingPage() {
   const [isJoinOpen, setIsJoinOpen] = useState(false);
   const [code, setCode] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   // Войти можно по коду из ссылки-приглашения, например «gruz2026».
   function handleJoin(event) {
     event.preventDefault();
     const trimmed = code.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      setError("Введите код из ссылки-приглашения");
+      return;
+    }
     // Если вставили целую ссылку, берём из неё последнюю часть.
     const fromLink = trimmed.split("/").filter(Boolean).pop();
-    navigate(`/trip/${fromLink}`);
+    setError("");
+    navigate(`/trip/${encodeURIComponent(fromLink)}`);
   }
 
   return (
@@ -44,9 +49,20 @@ export default function LandingPage() {
               type="text"
               placeholder="например gruz2026"
               autoFocus
+              aria-invalid={Boolean(error)}
               value={code}
-              onChange={(event) => setCode(event.target.value)}
+              onChange={(event) => {
+                setCode(event.target.value);
+                if (error) setError("");
+              }}
             />
+
+            {error && (
+              <p className="form__error" role="alert">
+                {error}
+              </p>
+            )}
+
             <button type="submit" className="btn btn--primary btn--block">
               Войти
             </button>
@@ -55,7 +71,10 @@ export default function LandingPage() {
           <button
             type="button"
             className="btn btn--secondary btn--block"
-            onClick={() => setIsJoinOpen(true)}
+            onClick={() => {
+              setError("");
+              setIsJoinOpen(true);
+            }}
           >
             Войти по ссылке
           </button>
