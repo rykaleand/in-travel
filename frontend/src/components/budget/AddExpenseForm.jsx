@@ -7,7 +7,7 @@ import { addExpense } from "../../api/budget-client.js";
 import { EXPENSE_CATEGORIES } from "../../utils/budget-utils.js";
 import { fullName, getInitials } from "../../utils/common-utils.js";
 
-export default function AddExpenseForm({ tripId, participants, onAdded }) {
+export default function AddExpenseForm({ tripId, participants, onAdded, onCancel }) {
   const [amount, setAmount] = useState("");
   const [payerId, setPayerId] = useState(null);
   const [category, setCategory] = useState("");
@@ -17,6 +17,8 @@ export default function AddExpenseForm({ tripId, participants, onAdded }) {
   const [sending, setSending] = useState(false);
 
   const payer = participants.find((p) => p.id === payerId);
+  // Красная рамка у суммы, если ошибка про неё (сумма не больше нуля).
+  const amountInvalid = Boolean(error) && !(Number(amount.replace(",", ".")) > 0);
 
   // Любое изменение в форме убирает старую ошибку: пользователь уже исправляет.
   function clearError() {
@@ -80,6 +82,7 @@ export default function AddExpenseForm({ tripId, participants, onAdded }) {
           inputMode="decimal"
           placeholder="0"
           autoFocus
+          aria-invalid={amountInvalid}
           value={amount}
           onChange={(e) => {
             clearError();
@@ -158,9 +161,15 @@ export default function AddExpenseForm({ tripId, participants, onAdded }) {
 
       {error && <p className="expense-form__error" role="alert">{error}</p>}
 
-      <button type="submit" className="btn btn--primary btn--block" disabled={sending}>
-        {sending ? "Сохраняем..." : "Добавить трату"}
-      </button>
+      {/* Футер окна по UI-киту: «Отмена» и основное действие */}
+      <div className="expense-form__actions">
+        <button type="button" className="btn btn--secondary" onClick={onCancel} disabled={sending}>
+          Отмена
+        </button>
+        <button type="submit" className="btn btn--primary" disabled={sending}>
+          {sending ? "Сохраняем..." : "Добавить трату"}
+        </button>
+      </div>
     </form>
   );
 }

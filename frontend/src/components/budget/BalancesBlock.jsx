@@ -18,12 +18,28 @@ export default function BalancesBlock({ tripId }) {
   const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    // Если tripId сменился или блок закрыли, ответ старого запроса игнорируем.
+    let ignore = false;
     setLoading(true);
     setError("");
     getBalances(tripId)
-      .then(setData)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .then((result) => {
+        if (ignore) return;
+        // Проверяем формат: ждём { balances: [...], transfers: [...] }.
+        if (!Array.isArray(result?.balances) || !Array.isArray(result?.transfers)) {
+          throw new Error("Сервер прислал данные в неожиданном формате");
+        }
+        setData(result);
+      })
+      .catch((e) => {
+        if (!ignore) setError(e.message);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
   }, [tripId, reloadKey]);
 
   // Заголовок одинаковый во всех состояниях, меняется только содержимое карточки.
@@ -37,7 +53,7 @@ export default function BalancesBlock({ tripId }) {
     );
   } else if (error) {
     content = (
-      <div className="budget-state budget-state--compact budget-state--error" role="alert">
+      <div className="budget-state budget-state--compact budget-state--error state-error-icon" role="alert">
         <p>Не получилось загрузить балансы: {error}</p>
         <button type="button" className="btn btn--secondary" onClick={() => setReloadKey((k) => k + 1)}>
           Попробовать снова

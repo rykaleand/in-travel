@@ -30,14 +30,16 @@ export default function TripPage() {
         setLoadError("");
         getTripByCode(invite_code)
             .then((data) => {
-                if (!cancelled) setTrip(data);
+                if (cancelled) return;
+                // Во вкладки уходит числовой id, без него показать разделы не можем.
+                if (!Number.isInteger(data?.id)) {
+                    throw new Error("Сервер прислал данные в неожиданном формате");
+                }
+                setTrip(data);
             })
             .catch((err) => {
-                if (!cancelled) {
-                    setLoadError(
-                        err.message === "Failed to fetch" ? "Не удалось связаться с сервером" : err.message
-                    );
-                }
+                // Понятный текст ошибки (в том числе «сервер недоступен») готовит request() в api/client.js.
+                if (!cancelled) setLoadError(err.message);
             });
         return () => {
             cancelled = true;
@@ -62,9 +64,10 @@ export default function TripPage() {
     function renderContent() {
         if (loadError) {
             return (
-                <div className="trip-state trip-state--error">
+                <div className="trip-state trip-state--error state-error-icon" role="alert">
+                    <p className="trip-state__title">Не удалось загрузить поездку</p>
                     <p>{loadError}</p>
-                    <button type="button" className="btn btn--primary" onClick={() => setReloadKey((k) => k + 1)}>
+                    <button type="button" className="btn btn--secondary" onClick={() => setReloadKey((k) => k + 1)}>
                         Попробовать снова
                     </button>
                 </div>
@@ -81,10 +84,11 @@ export default function TripPage() {
         switch (activeTab) {
             case "tickets":
                 return <TicketsTab trip={trip} onTicketSaved={handleTicketSaved} />;
+            // key={trip.id}: в другой поездке вкладка создаётся заново и не покажет данные предыдущей.
             case "budget":
-                return <BudgetTab tripId={trip.id} />;
+                return <BudgetTab key={trip.id} tripId={trip.id} />;
             case "checklist":
-                return <ChecklistTab tripId={trip.id} />;
+                return <ChecklistTab key={trip.id} tripId={trip.id} />;
             default: {
                 const tab = TABS.find((item) => item.id === activeTab);
                 return (

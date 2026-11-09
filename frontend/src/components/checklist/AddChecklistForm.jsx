@@ -48,6 +48,7 @@ export default function AddChecklistForm({ existingTitles, onAdd }) {
           type="text"
           placeholder="Например, взять зарядку"
           aria-label="Новый пункт"
+          aria-invalid={Boolean(error)}
           value={title}
           onChange={(e) => {
             if (error) setError(""); // пользователь уже исправляет

@@ -4,10 +4,27 @@ const API_URL = "http://localhost:5000";
 
 // Общая функция: отправляет запрос, возвращает JSON или бросает ошибку с понятным текстом.
 export async function request(path, options = {}) {
-  const response = await fetch(API_URL + path, options);
-  const data = await response.json();
+  let response;
+  try {
+    response = await fetch(API_URL + path, options);
+  } catch {
+    // fetch падает, когда сервер выключен или недоступен.
+    throw new Error("Не удалось связаться с сервером. Проверьте, что backend запущен");
+  }
+
+  // Сервер может прислать не JSON (например, страницу ошибки 500).
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
   if (!response.ok) {
-    throw new Error(data.error || "Что-то пошло не так");
+    throw new Error(data?.error || `Ошибка сервера (${response.status})`);
+  }
+  if (data === null) {
+    throw new Error("Сервер прислал непонятный ответ");
   }
   return data;
 }
@@ -33,6 +50,7 @@ export async function createTrip({ name }) {
     });
 }
 
+// GET /trips/<invite_code>: поездка по коду приглашения (вход по ссылке).
 export function getTripByCode(inviteCode) {
-    return request(`/trips/${inviteCode}`);
+  return request(`/trips/${encodeURIComponent(inviteCode)}`);
 }

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { getExpenses } from "../../api/budget-client.js";
 import { getParticipants } from "../../api/participants-client.js";
+import { ensureArray } from "../../utils/common-utils.js";
 import Modal from "../common/Modal.jsx";
 import AddExpenseForm from "./AddExpenseForm.jsx";
 import BalancesBlock from "./BalancesBlock.jsx";
@@ -28,22 +29,32 @@ export default function BudgetTab({ tripId }) {
 
   // Загружаем траты и участников одновременно.
   useEffect(() => {
+    // Если tripId сменился или вкладку закрыли, ответ старого запроса игнорируем.
+    let ignore = false;
     setLoading(true);
     setError("");
     Promise.all([getExpenses(tripId), getParticipants(tripId)])
       .then(([expensesData, participantsData]) => {
-        setExpenses(expensesData);
-        setParticipants(participantsData);
+        if (ignore) return;
+        setExpenses(ensureArray(expensesData));
+        setParticipants(ensureArray(participantsData));
       })
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .catch((e) => {
+        if (!ignore) setError(e.message);
+      })
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+    return () => {
+      ignore = true;
+    };
   }, [tripId, reloadKey]);
 
   // Вызывается формой после успешного добавления: закрываем окно, обновляем список и балансы.
   function handleExpenseAdded() {
     setIsFormOpen(false);
     getExpenses(tripId)
-      .then(setExpenses)
+      .then((data) => setExpenses(ensureArray(data)))
       .catch((e) => setError(e.message));
     setBalancesVersion((v) => v + 1);
   }
@@ -62,7 +73,7 @@ export default function BudgetTab({ tripId }) {
   if (error) {
     return (
       <div className="budget-tab">
-        <div className="budget-state budget-state--error" role="alert">
+        <div className="budget-state budget-state--error state-error-icon" role="alert">
           <p>Не получилось загрузить бюджет: {error}</p>
           <button type="button" className="btn btn--secondary" onClick={() => setReloadKey((k) => k + 1)}>
             Попробовать снова
@@ -103,7 +114,12 @@ export default function BudgetTab({ tripId }) {
 
       {isFormOpen && (
         <Modal title="Новая трата" onClose={() => setIsFormOpen(false)}>
-          <AddExpenseForm tripId={tripId} participants={participants} onAdded={handleExpenseAdded} />
+          <AddExpenseForm
+            tripId={tripId}
+            participants={participants}
+            onAdded={handleExpenseAdded}
+            onCancel={() => setIsFormOpen(false)}
+          />
         </Modal>
       )}
     </div>

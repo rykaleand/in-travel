@@ -39,46 +39,16 @@
   margin: 0;
   padding: 12px 16px;
   border-radius: var(--radius-sm);
-  background: var(--color-primary-soft);
+  background: var(--color-primary-faint);
   font-size: 14px;
 }
 
 /* ---------- Кнопки ---------- */
 
-.btn {
-  min-height: 44px;
-  padding: 0 20px;
-  border: none;
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
+/* Сами кнопки общие (styles/index.css), здесь только запрет переноса текста */
+.budget-tab .btn,
+.modal .btn {
   white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.btn--primary {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-}
-
-.btn--primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-}
-
-.btn--secondary {
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-}
-
-.btn--block {
-  width: 100%;
 }
 
 /* ---------- Карточки: итоги и список трат ---------- */
@@ -249,7 +219,7 @@
   min-height: 52px;
   box-sizing: border-box;
   padding: 0 16px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-text);
@@ -259,14 +229,25 @@
 
 .expense-form__input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  /* фокус по UI-киту: рамка accent 2 px и мягкое кольцо */
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent), var(--focus-shadow);
 }
 
 .expense-form__hint {
   margin: 0;
   color: var(--color-text-muted);
   font-size: 13px;
+}
+
+/* Футер окна: «Отмена» и основное действие рядом */
+.expense-form__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.expense-form__actions .btn {
+  flex: 1;
 }
 
 .expense-form__error {
@@ -332,9 +313,8 @@
 }
 
 .chip:focus-visible,
-.avatar-chip:focus-visible,
-.btn:focus-visible {
-  outline: 2px solid var(--color-primary);
+.avatar-chip:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
@@ -400,7 +380,7 @@
 
 .balance-row__amount--plus {
   background: var(--color-success-soft);
-  color: var(--color-success);
+  color: var(--color-success-strong); /* светлый --color-success на зелёном фоне не читается */
 }
 
 .balance-row__amount--minus {

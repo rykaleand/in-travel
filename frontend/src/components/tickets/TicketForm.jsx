@@ -33,6 +33,7 @@ export default function TicketForm({ initialValues, isSaving, error, onSave, onC
                     id="ticket-link"
                     className="ticket-form__input"
                     type="text"
+                    aria-invalid={Boolean(linkError)}
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
                     placeholder="https://www.aviasales.com/search/MOW0209TBS1"

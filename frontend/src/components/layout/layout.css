@@ -72,7 +72,7 @@
     margin: 0;
     padding: 8px 12px;
     border-radius: var(--radius-sm);
-    background: var(--color-primary-soft);
+    background: var(--color-primary-faint);
     font-size: 14px;
     white-space: nowrap;
 }
@@ -188,7 +188,7 @@
 
 .layout-header__icon-btn:focus-visible,
 .layout-sidebar__item:focus-visible {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-focus-ring);
     outline-offset: 2px;
 }
 
@@ -222,6 +222,6 @@
         inset: var(--layout-header-height) 0 0 0;
         z-index: 10;
         display: block;
-        background: rgba(0, 0, 0, 0.35);
+        background: var(--color-overlay);
     }
 }
