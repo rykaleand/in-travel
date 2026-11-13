@@ -45,9 +45,10 @@
 
 ## Данные
 
-Шесть таблиц: TRIPS, PARTICIPANTS, ROUTE_STOPS, EXPENSES, EXPENSE_SHARES, CHECKLIST_ITEMS.
+Семь таблиц: TRIPS, PARTICIPANTS, ROUTE_STOPS, EXPENSES, EXPENSE_SHARES, CHECKLIST_ITEMS, TICKETS.
 Все, кроме TRIPS, ссылаются на `trip_id`. Пользователей нет: участник это имя и фамилия внутри поездки.
-Информация о билете хранится полями в TRIPS (`ticket_link`, `flight_number`, `flight_time`).
+Билеты хранятся в отдельной таблице TICKETS (`ticket_link`, `flight_number`, `flight_time`),
+у одной поездки их может быть несколько (задача #79).
 
 ## Правила backend
 

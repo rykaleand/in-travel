@@ -10,9 +10,6 @@ def _to_domain(row):
         id=row.id,
         name=row.name,
         invite_code=row.invite_code,
-        ticket_link=row.ticket_link,
-        flight_number=row.flight_number,
-        flight_time=row.flight_time,
     )
 
 
@@ -27,9 +24,6 @@ def create(trip):
     row = TripModel(
         name=trip.name,
         invite_code=trip.invite_code,
-        ticket_link=trip.ticket_link,
-        flight_number=trip.flight_number,
-        flight_time=trip.flight_time,
     )
     db.session.add(row)
     db.session.commit()
@@ -39,17 +33,6 @@ def get_by_id(trip_id):
     """Одна поездка или None, если такой нет."""
     row = db.session.get(TripModel, trip_id)
     return _to_domain(row) if row else None
-
-def update_ticket(trip_id, ticket_link, flight_number, flight_time):
-    """Сохраняет данные билета. Возвращает обновлённую поездку или None, если её нет."""
-    row = db.session.get(TripModel, trip_id)
-    if row is None:
-        return None
-    row.ticket_link = ticket_link
-    row.flight_number = flight_number
-    row.flight_time = flight_time
-    db.session.commit()
-    return _to_domain(row)
 
 def get_by_invite_code(code):
     row = TripModel.query.filter_by(invite_code=code).first()
