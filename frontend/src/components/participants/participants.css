@@ -1,0 +1,235 @@
+/* Вкладка «Участники» (#22). Устроена как вкладка чек-листа: цвета и скругления
+   из styles/style.css, кнопки .btn общие (styles/index.css). */
+
+.participants-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  color: var(--color-text);
+  font-family: var(--font-family);
+}
+
+/* ---------- Шапка: заголовок и число участников ---------- */
+
+.participants-tab__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.participants-tab__title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.participants-tab__counter {
+  flex-shrink: 0;
+  min-width: 28px;
+  padding: 4px 10px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.participants-tab__intro {
+  margin: -12px 0 0; /* подпись ближе к заголовку */
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+/* ---------- Карточка: форма и список ---------- */
+
+.participants-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Форма: имя, фамилия, кнопка ---------- */
+
+.participants-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* На широком экране поля и кнопка в одну строку, кнопка по нижнему краю полей */
+.participants-form__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.participants-form__field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0; /* чтобы поле сжималось на узком экране */
+}
+
+.participants-form__label {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.participants-form__input {
+  min-height: 44px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 16px; /* не меньше 16px, иначе iPhone увеличивает страницу при вводе */
+}
+
+.participants-form__input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent), var(--focus-shadow);
+}
+
+/* Поле с ошибкой: красная рамка */
+.participants-form__input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+}
+
+.participants-form__field-error {
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+/* Кнопка на уровне полей: сдвигаем вниз на высоту подписи */
+.participants-form__submit {
+  min-height: 44px;
+  margin-top: 22px;
+}
+
+/* На телефоне поля друг под другом, кнопка во всю ширину */
+@media (max-width: 560px) {
+  .participants-form__row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .participants-form__submit {
+    margin-top: 4px;
+  }
+}
+
+.participants-error {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: 14px;
+}
+
+/* ---------- Список участников ---------- */
+
+.participants-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 6px 0;
+}
+
+.participant-item + .participant-item {
+  border-top: 1px solid var(--color-border);
+}
+
+/* Кружок с инициалами, как аватарки в бюджете */
+.participant-item__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.participant-item__name {
+  min-width: 0;
+  overflow-wrap: anywhere; /* длинное имя переносится, а не вылезает за край */
+}
+
+/* ---------- Состояния: загрузка, ошибка, пусто ---------- */
+
+.participants-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.participants-state p {
+  margin: 0;
+}
+
+.participants-state--error {
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.participants-state .spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--color-primary-soft);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: participants-spin 0.8s linear infinite;
+}
+
+@keyframes participants-spin {
+  to { transform: rotate(360deg); }
+}
+
+.participants-empty {
+  padding: 8px 0 4px;
+  text-align: center;
+}
+
+.participants-empty__title {
+  margin: 0 0 4px;
+  font-weight: 500;
+}
+
+.participants-empty__text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}

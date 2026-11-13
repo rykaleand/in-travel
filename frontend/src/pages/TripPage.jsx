@@ -5,6 +5,7 @@ import Layout from "../components/layout/Layout";
 import TicketsTab from "../components/tickets/TicketsTab";
 import BudgetTab from "../components/budget/BudgetTab";
 import ChecklistTab from "../components/checklist/ChecklistTab";
+import ParticipantsTab from "../components/participants/ParticipantsTab";
 import "./trip-page.css";
 
 
@@ -89,6 +90,8 @@ export default function TripPage() {
                 return <BudgetTab key={trip.id} tripId={trip.id} />;
             case "checklist":
                 return <ChecklistTab key={trip.id} tripId={trip.id} />;
+            case "participants":
+                return <ParticipantsTab key={trip.id} tripId={trip.id} />;
             default: {
                 const tab = TABS.find((item) => item.id === activeTab);
                 return (
