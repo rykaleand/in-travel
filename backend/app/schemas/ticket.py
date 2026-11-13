@@ -1,5 +1,5 @@
 # DTO билета: что присылает клиент (TicketRequest) и что мы отвечаем (TicketResponse).
-# Сам билет хранится полями поездки: ticket_link, flight_number, flight_time.
+# Билеты хранятся в отдельной таблице tickets, у поездки их может быть несколько.
 from dataclasses import asdict, dataclass
 from typing import Optional
 
@@ -26,21 +26,23 @@ class TicketRequest:
 
 @dataclass
 class TicketResponse:
+    id: int
     trip_id: int
     ticket_link: Optional[str]
     flight_number: Optional[str]
     flight_time: Optional[str]  # дата строкой, потому что в JSON нет типа datetime
-    aviasales: Optional[dict]  # разбор ссылки Aviasales или None
+    aviasales: Optional[dict]  # разбор ссылки Aviasales или None, в базе не хранится
 
     @classmethod
-    def from_domain(cls, trip):
-        """Собираем ответ из доменной модели Trip. Ссылку разбираем так же, как в TripResponse."""
+    def from_domain(cls, ticket):
+        """Собираем ответ из доменной модели Ticket и разбираем ссылку Aviasales."""
         return cls(
-            trip_id=trip.id,
-            ticket_link=trip.ticket_link,
-            flight_number=trip.flight_number,
-            flight_time=trip.flight_time.isoformat() if trip.flight_time else None,
-            aviasales=get_aviasales_info(trip.ticket_link),
+            id=ticket.id,
+            trip_id=ticket.trip_id,
+            ticket_link=ticket.ticket_link,
+            flight_number=ticket.flight_number,
+            flight_time=ticket.flight_time.isoformat() if ticket.flight_time else None,
+            aviasales=get_aviasales_info(ticket.ticket_link),
         )
 
     def to_dict(self):

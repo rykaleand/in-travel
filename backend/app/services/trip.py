@@ -31,9 +31,6 @@ def create_trip(name):
         id=None,
         name=name,
         invite_code=_generate_unique_invite_code(),
-        ticket_link=None,
-        flight_number=None,
-        flight_time=None,
     )
     return trip_repository.create(trip)
 

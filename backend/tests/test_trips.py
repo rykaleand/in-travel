@@ -37,7 +37,8 @@ def test_list_trips(client):
 
     trips = client.get("/trips").get_json()
     assert [t["name"] for t in trips] == ["Грузия"]
-    assert trips[0]["flight_time"] is None
+    # Билеты теперь отдельно (GET /trips/<id>/tickets), в поездке их полей нет
+    assert "flight_time" not in trips[0]
 
 def _trip_count(client):
     from app.extensions import db
