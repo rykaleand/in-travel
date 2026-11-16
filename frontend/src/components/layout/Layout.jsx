@@ -18,15 +18,17 @@ export default function Layout({ title, tabs, activeTab, onTabChange, children }
     }
 
     async function handleShare() {
-        const link = window.location.href;
+        const url = new URL(window.location.href);
+        url.pathname = url.pathname.replace(/^\/trip\//, "/join/");
+        const link = url.href;
         try {
             await navigator.clipboard.writeText(link);
             setShareHint("Ссылка скопирована");
+            // Успешное копирование подтверждаем на пару секунд.
+            setTimeout(() => setShareHint(""), 2500);
         } catch {
-            setShareHint("Скопируйте ссылку из адресной строки");
+            setShareHint(`Скопируйте ссылку-приглашение: ${link}`);
         }
-        // Подсказка исчезает сама через пару секунд
-        setTimeout(() => setShareHint(""), 2500);
     }
 
     return (
