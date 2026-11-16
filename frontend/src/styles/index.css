@@ -244,3 +244,18 @@ input:disabled {
   font-size: 15px;
   line-height: 1.5;
 }
+
+/* Узкие экраны (360 px и около): меньше внешние отступы, больше места под контент */
+@media (max-width: 400px) {
+  .page {
+    padding: 16px 12px;
+  }
+
+  .page__card {
+    padding: 24px 16px;
+  }
+
+  .page__title {
+    font-size: 24px;
+  }
+}

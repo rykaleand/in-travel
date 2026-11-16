@@ -54,3 +54,13 @@ export async function createTrip({ name }) {
 export function getTripByCode(inviteCode) {
   return request(`/trips/${encodeURIComponent(inviteCode)}`);
 }
+
+// POST /trips/<trip_id>/participants: добавить участника в поездку.
+// data: { first_name, last_name } — имя и фамилия.
+export async function addParticipant(tripId, { first_name, last_name }) {
+  return request(`/trips/${tripId}/participants`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ first_name, last_name }),
+  });
+}
