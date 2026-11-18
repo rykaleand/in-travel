@@ -64,9 +64,6 @@ export async function addParticipant(tripId, { first_name, last_name }) {
     body: JSON.stringify({ first_name, last_name }),
   });
 }
-export function getTripByCode(inviteCode) {
-    return request(`/trips/${inviteCode}`);
-}
 
 const STOP_FIELDS = ["day_number", "title", "status"];
 
