@@ -64,3 +64,65 @@ export async function addParticipant(tripId, { first_name, last_name }) {
     body: JSON.stringify({ first_name, last_name }),
   });
 }
+export function getTripByCode(inviteCode) {
+    return request(`/trips/${inviteCode}`);
+}
+
+const STOP_FIELDS = ["day_number", "title", "status"];
+
+function isValidCoord(value, limit) {
+    return typeof value === "number" && Number.isFinite(value) && value >= -limit && value <= limit;
+}
+
+export function buildStopPayload(data = {}) {
+    const payload = {};
+    for (const field of STOP_FIELDS) {
+        if (data[field] !== undefined) payload[field] = data[field];
+    }
+
+    const hasLat = data.latitude !== undefined;
+    const hasLng = data.longitude !== undefined;
+    if (!hasLat && !hasLng) return payload;
+
+    if (hasLat !== hasLng) {
+        throw new Error("Координаты передаются парой: нужны и latitude, и longitude");
+    }
+
+    const { latitude, longitude } = data;
+    if (latitude === null && longitude === null) {
+        payload.latitude = null;
+        payload.longitude = null;
+        return payload;
+    }
+
+    if (!isValidCoord(latitude, 90) || !isValidCoord(longitude, 180)) {
+        throw new Error(
+            "latitude — число от -90 до 90, longitude — число от -180 до 180 (или оба null)"
+        );
+    }
+    payload.latitude = latitude;
+    payload.longitude = longitude;
+    return payload;
+}
+
+export async function getStops(tripId) {
+    return request(`/trips/${encodeURIComponent(tripId)}/stops`);
+}
+
+export async function addStop(tripId, data) {
+    return request(`/trips/${encodeURIComponent(tripId)}/stops`, {
+        method: "POST",
+        body: buildStopPayload(data),
+    });
+}
+export async function updateStop(stopId, data) {
+    return request(`/stops/${encodeURIComponent(stopId)}`, {
+        method: "PUT",
+        body: buildStopPayload(data),
+    });
+}
+
+export async function deleteStop(stopId) {
+    return request(`/stops/${encodeURIComponent(stopId)}`, { method: "DELETE" });
+}
+
