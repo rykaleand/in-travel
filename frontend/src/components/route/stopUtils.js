@@ -32,3 +32,29 @@ export function validateStopForm({ title, day }) {
         values: { title: trimmedTitle, day_number: dayNumber },
     };
 }
+export function getStopLocation(stop) {
+    const { latitude, longitude } = stop;
+    if (latitude == null || longitude == null) return null;
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+    return Number.isFinite(lat) && Number.isFinite(lng) ? { latitude: lat, longitude: lng } : null;
+}
+
+// Карта повторяется по горизонтали, клик может дать долготу вне ±180 — приводим к диапазону.
+export function toCoordinates(location) {
+    const { latitude, longitude } = location;
+    if (longitude >= -180 && longitude <= 180) return { latitude, longitude };
+    const wrapped = ((((longitude + 180) % 360) + 360) % 360) - 180;
+    return { latitude, longitude: wrapped };
+}
+
+export function coordinatesPatch(initial, current) {
+    if (!initial && !current) return {};
+    if (
+        initial && current &&
+        initial.latitude === current.latitude &&
+        initial.longitude === current.longitude
+    ) return {};
+    if (current) return toCoordinates(current);
+    return { latitude: null, longitude: null };
+}

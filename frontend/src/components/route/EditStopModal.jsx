@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { STATUS_OPTIONS, errorMessage, validateStopForm } from "./stopUtils";
+import LocationPicker from "./LocationPicker";
+import {
+    STATUS_OPTIONS,
+    coordinatesPatch,
+    errorMessage,
+    getStopLocation,
+    validateStopForm,
+} from "./stopUtils";
 
 // Модальное окно редактирования точки
 export default function EditStopModal({ stop, onSave, onDelete, onClose }) {
@@ -9,6 +16,8 @@ export default function EditStopModal({ stop, onSave, onDelete, onClose }) {
     const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState("");
     const [isBusy, setIsBusy] = useState(false);
+    const [initialLocation] = useState(() => getStopLocation(stop));
+    const [location, setLocation] = useState(initialLocation);
 
     useEffect(() => {
         function handleKey(event) {
@@ -34,7 +43,8 @@ export default function EditStopModal({ stop, onSave, onDelete, onClose }) {
         const result = validateStopForm({ title, day });
         setErrors(result.errors);
         if (!result.ok) return;
-        run(() => onSave(stop.id, { ...result.values, status }));
+        const coordinates = coordinatesPatch(initialLocation, location);
+        run(() => onSave(stop.id, { ...result.values, status, ...coordinates }));
     }
 
     function handleDelete() {
@@ -96,6 +106,11 @@ export default function EditStopModal({ stop, onSave, onDelete, onClose }) {
                             </option>
                         ))}
                     </select>
+                </div>
+
+                <div className="stop-form__field">
+                    <span className="stop-form__label">Место на карте</span>
+                    <LocationPicker value={location} onChange={setLocation} />
                 </div>
 
                 {submitError && (

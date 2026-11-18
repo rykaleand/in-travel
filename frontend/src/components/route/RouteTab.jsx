@@ -5,6 +5,7 @@ import EditStopModal from "./EditStopModal";
 import StopList from "./StopList";
 import { errorMessage } from "./stopUtils";
 import "./route.css";
+import RouteMap from "./RouteMap";
 
 // Вкладка «Маршрут»: загружает точки, держит загрузку и ошибку
 export default function RouteTab({ tripId }) {
@@ -114,7 +115,10 @@ export default function RouteTab({ tripId }) {
                     </div>
                 )
             ) : (
-                <StopList stops={stops} onEdit={setEditingStop} onDelete={handleDeleteFromCard} />
+                <>
+                    <RouteMap stops={stops} />
+                    <StopList stops={stops} onEdit={setEditingStop} onDelete={handleDeleteFromCard} />
+                </>
             )}
 
             {editingStop && (

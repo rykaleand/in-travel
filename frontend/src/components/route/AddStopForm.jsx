@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { errorMessage, validateStopForm } from "./stopUtils";
+import LocationPicker from "./LocationPicker";
+import { errorMessage, toCoordinates, validateStopForm } from "./stopUtils";
 
 // Форма добавления точки
 //   onSubmit(data) — async, при ошибке бросает исключение;
 //   onCancel() — закрыть форму
 export default function AddStopForm({ onSubmit, onCancel, defaultDay = 1 }) {
     const [title, setTitle] = useState("");
+    const [location, setLocation] = useState(null);
     const [day, setDay] = useState(String(defaultDay));
     const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState("");
@@ -20,7 +22,9 @@ export default function AddStopForm({ onSubmit, onCancel, defaultDay = 1 }) {
         setIsSaving(true);
         setSubmitError("");
         try {
-            await onSubmit({ ...result.values, status: "proposed" });
+            const data = { ...result.values, status: "proposed" };
+            if (location) Object.assign(data, toCoordinates(location));
+            await onSubmit(data);
         } catch (err) {
             setSubmitError(errorMessage(err));
         } finally {
@@ -54,6 +58,11 @@ export default function AddStopForm({ onSubmit, onCancel, defaultDay = 1 }) {
                     aria-invalid={Boolean(errors.day)}
                 />
                 {errors.day && <p className="stop-form__error">{errors.day}</p>}
+            </div>
+
+            <div className="stop-form__field">
+                <span className="stop-form__label">Место на карте (необязательно)</span>
+                <LocationPicker value={location} onChange={setLocation} />
             </div>
 
             {submitError && (
