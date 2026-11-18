@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { getStopLocation } from "./stopUtils";
+import { AttributionControl, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
 const stopIcon = L.icon({
     iconUrl: markerIcon,
@@ -46,6 +46,7 @@ export default function RouteMap({ stops }) {
                 center={positions[0]}
                 zoom={5}
                 scrollWheelZoom={false}
+                attributionControl={false}
                 className="route-map__container"
             >
                 <TileLayer
@@ -62,6 +63,7 @@ export default function RouteMap({ stops }) {
                         </Popup>
                     </Marker>
                 ))}
+                <AttributionControl prefix={false} />
             </MapContainer>
         </div>
     );
