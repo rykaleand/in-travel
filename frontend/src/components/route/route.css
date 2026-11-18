@@ -1,7 +1,7 @@
 .route-tab {
     box-sizing: border-box;
     width: calc(100% - 32px);
-    max-width: 720px;
+    max-width: 1120px;
     margin: 24px auto;
 }
 
@@ -212,8 +212,9 @@
 }
 
 .route-map {
-    height: 320px;
-    margin-bottom: 20px;
+    height: calc(100vh - var(--layout-header-height, 64px) - 120px);
+    min-height: 360px;
+    max-height: 640px;
     overflow: hidden;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -227,4 +228,35 @@
 .stop-form__label {
     font-size: 14px;
     font-weight: 500;
+}
+.route-tab > .stop-form {
+    max-width: 720px;
+}
+
+.route-tab__body--with-map {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.route-tab__map {
+    position: sticky;
+    top: calc(var(--layout-header-height, 64px) + 16px);
+}
+
+@media (max-width: 900px) {
+    .route-tab__body--with-map {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .route-tab__map {
+        position: static;
+        order: -1;
+    }
+
+    .route-map {
+        height: 280px;
+        min-height: 0;
+    }
 }

@@ -3,9 +3,10 @@ import { addStop, deleteStop, getStops, updateStop } from "../../api/client";
 import AddStopForm from "./AddStopForm";
 import EditStopModal from "./EditStopModal";
 import StopList from "./StopList";
-import { errorMessage } from "./stopUtils";
+import { errorMessage, getStopLocation } from "./stopUtils";
 import "./route.css";
 import RouteMap from "./RouteMap";
+
 
 // Вкладка «Маршрут»: загружает точки, держит загрузку и ошибку
 export default function RouteTab({ tripId }) {
@@ -85,6 +86,7 @@ export default function RouteTab({ tripId }) {
             </div>
         );
     }
+    const hasMap = stops.some((stop) => getStopLocation(stop));
 
     return (
         <section className="route-tab">
@@ -115,10 +117,16 @@ export default function RouteTab({ tripId }) {
                     </div>
                 )
             ) : (
-                <>
-                    <RouteMap stops={stops} />
-                    <StopList stops={stops} onEdit={setEditingStop} onDelete={handleDeleteFromCard} />
-                </>
+                <div className={"route-tab__body" + (hasMap ? " route-tab__body--with-map" : "")}>
+                    <div className="route-tab__list">
+                        <StopList stops={stops} onEdit={setEditingStop} onDelete={handleDeleteFromCard} />
+                    </div>
+                    {hasMap && (
+                        <aside className="route-tab__map" aria-label="Карта маршрута">
+                            <RouteMap stops={stops} />
+                        </aside>
+                    )}
+                </div>
             )}
 
             {editingStop && (
