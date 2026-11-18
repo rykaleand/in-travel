@@ -112,13 +112,16 @@ export async function getStops(tripId) {
 export async function addStop(tripId, data) {
     return request(`/trips/${encodeURIComponent(tripId)}/stops`, {
         method: "POST",
-        body: buildStopPayload(data),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildStopPayload(data)),
     });
 }
+
 export async function updateStop(stopId, data) {
     return request(`/stops/${encodeURIComponent(stopId)}`, {
         method: "PUT",
-        body: buildStopPayload(data),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildStopPayload(data)),
     });
 }
 
