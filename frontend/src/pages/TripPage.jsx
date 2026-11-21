@@ -7,6 +7,7 @@ import BudgetTab from "../components/budget/BudgetTab";
 import ChecklistTab from "../components/checklist/ChecklistTab";
 import ParticipantsTab from "../components/participants/ParticipantsTab";
 import "./trip-page.css";
+import RouteTab from "../components/route/RouteTab";
 
 
 
@@ -83,6 +84,8 @@ export default function TripPage() {
             );
         }
         switch (activeTab) {
+            case "route":
+                return <RouteTab tripId={trip.id} />;
             case "tickets":
                 return <TicketsTab trip={trip} onTicketSaved={handleTicketSaved} />;
             // key={trip.id}: в другой поездке вкладка создаётся заново и не покажет данные предыдущей.
