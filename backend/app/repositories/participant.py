@@ -21,12 +21,24 @@ def get_by_trip(trip_id):
     return [_to_domain(row) for row in rows]
 
 
-def create(participant):
+def create(participant, *, commit=True):
     row = ParticipantModel(
         trip_id=participant.trip_id,
         first_name=participant.first_name,
         last_name=participant.last_name,
     )
     db.session.add(row)
-    db.session.commit()
+    if commit:
+        db.session.commit()
+    else:
+        # Получаем id, но оставляем участника и изменения трат в одной транзакции.
+        db.session.flush()
     return _to_domain(row)
+
+
+def commit():
+    db.session.commit()
+
+
+def rollback():
+    db.session.rollback()

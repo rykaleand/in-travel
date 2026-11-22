@@ -171,6 +171,19 @@ docker compose -f docker/docker-compose.yml up --build
 
 Backend будет на http://localhost:5000, frontend на http://localhost:5173. Остановить: `Ctrl+C`. Код подхватывается из ваших папок `backend/` и `frontend/`, так что правки видны сразу, а файл базы `intravel.db` лежит в `backend/` и не пропадает при перезапуске. Чтобы добавить тестовые поездки: `docker compose -f docker/docker-compose.yml exec backend python seed_example.py`.
 
+### Развёртывание в Amvera
+
+Для Amvera подготовлены `amvera.yml` и `deploy/amvera.Dockerfile`. Один контейнер
+собирает frontend, запускает Flask через Gunicorn и раздаёт сайт и API на порту 80.
+
+При подключении GitHub выберите нужную ветку и запустите сборку. Дополнительные
+переменные окружения не требуются. SQLite автоматически сохраняется в
+`/data/intravel.db`; каталог `/data` подключён как постоянное хранилище, поэтому
+данные не пропадут при пересборке приложения.
+
+Локальный запуск не меняется: без переменной `DATABASE_PATH` база продолжает
+создаваться в `backend/intravel.db`.
+
 ## Кто за что отвечает
 
 | Роль | Где работает |

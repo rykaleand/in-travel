@@ -45,6 +45,23 @@ def create(expense):
     return _to_domain(row)
 
 
+def update_shares(expense_id, shares):
+    """Обновляет суммы существующих долей и добавляет недостающие без commit."""
+    row = db.session.get(ExpenseModel, expense_id)
+    existing = {share.participant_id: share for share in row.shares}
+    for share in shares:
+        stored = existing.get(share.participant_id)
+        if stored is None:
+            row.shares.append(
+                ExpenseShareModel(
+                    participant_id=share.participant_id,
+                    share_amount=share.share_amount,
+                )
+            )
+        else:
+            stored.share_amount = share.share_amount
+
+
 # Два вспомогательных запроса для проверок в сервисе расходов.
 # Когда Backend 1 сделает репозитории поездок и участников, их можно перенести туда.
 def trip_exists(trip_id):

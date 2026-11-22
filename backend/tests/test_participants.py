@@ -71,3 +71,42 @@ def test_participants_belong_to_their_trip(client):
     list_b = client.get(f"/trips/{trip_b['id']}/participants").get_json()
     assert [p["first_name"] for p in list_a] == ["Анна"]
     assert [p["first_name"] for p in list_b] == ["Олег"]
+
+
+def test_new_participant_is_added_to_existing_expenses_and_balances(client):
+    trip = client.post("/trips", json={"name": "Тест"}).get_json()
+    participants_url = f"/trips/{trip['id']}/participants"
+
+    anna = client.post(
+        participants_url, json={"first_name": "Анна", "last_name": "Иванова"}
+    ).get_json()
+    boris = client.post(
+        participants_url, json={"first_name": "Борис", "last_name": "Петров"}
+    ).get_json()
+    client.post(
+        f"/trips/{trip['id']}/expenses",
+        json={
+            "amount": 100,
+            "category": "еда",
+            "payer_id": anna["id"],
+            "participant_ids": [anna["id"], boris["id"]],
+        },
+    )
+
+    vera = client.post(
+        participants_url, json={"first_name": "Вера", "last_name": "Сидорова"}
+    ).get_json()
+
+    expense = client.get(f"/trips/{trip['id']}/expenses").get_json()[0]
+    assert expense["shares"] == [
+        {"participant_id": anna["id"], "share_amount": 33.34},
+        {"participant_id": boris["id"], "share_amount": 33.33},
+        {"participant_id": vera["id"], "share_amount": 33.33},
+    ]
+
+    balances = client.get(f"/trips/{trip['id']}/balances").get_json()["balances"]
+    assert {item["participant_id"]: item["balance"] for item in balances} == {
+        anna["id"]: 66.66,
+        boris["id"]: -33.33,
+        vera["id"]: -33.33,
+    }
