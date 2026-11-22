@@ -1,11 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { addStop, deleteStop, getStops, updateStop } from "../../api/client";
 import AddStopForm from "./AddStopForm";
 import EditStopModal from "./EditStopModal";
 import StopList from "./StopList";
 import { errorMessage, getStopLocation } from "./stopUtils";
 import "./route.css";
-import RouteMap from "./RouteMap";
+const RouteMap = lazy(() => import("./RouteMap"));
+
+function sortStops(stops) {
+    return [...stops].sort((first, second) => first.day_number - second.day_number || first.id - second.id);
+}
+
+function MapLoading() {
+    return <div className="route-map route-map--loading">Загружаем карту…</div>;
+}
 
 
 // Вкладка «Маршрут»: загружает точки, держит загрузку и ошибку
@@ -15,6 +23,7 @@ export default function RouteTab({ tripId }) {
     const [actionError, setActionError] = useState("");
     const [isAdding, setIsAdding] = useState(false);
     const [editingStop, setEditingStop] = useState(null);
+    const [confirmingStopId, setConfirmingStopId] = useState(null);
     const requestId = useRef(0);
 
     const load = useCallback(
@@ -40,30 +49,43 @@ export default function RouteTab({ tripId }) {
     }, [load]);
 
     async function handleAdd(data) {
-        await addStop(tripId, data);
+        const created = await addStop(tripId, data);
+        setStops((current) => sortStops([...current, created]));
         setIsAdding(false);
-        await load({ silent: true });
     }
 
     async function handleSave(stopId, data) {
-        await updateStop(stopId, data);
+        const updated = await updateStop(stopId, data);
+        setStops((current) => sortStops(current.map((stop) => stop.id === stopId ? updated : stop)));
         setEditingStop(null);
-        await load({ silent: true });
     }
 
     async function handleDeleteFromModal(stopId) {
         await deleteStop(stopId);
+        setStops((current) => current.filter((stop) => stop.id !== stopId));
         setEditingStop(null);
-        await load({ silent: true });
     }
 
     async function handleDeleteFromCard(stop) {
         setActionError("");
         try {
             await deleteStop(stop.id);
-            await load({ silent: true });
+            setStops((current) => current.filter((item) => item.id !== stop.id));
         } catch (err) {
             setActionError(errorMessage(err));
+        }
+    }
+
+    async function handleConfirmStop(stop) {
+        setActionError("");
+        setConfirmingStopId(stop.id);
+        try {
+            const updated = await updateStop(stop.id, { status: "confirmed" });
+            setStops((current) => current.map((item) => item.id === stop.id ? updated : item));
+        } catch (err) {
+            setActionError(errorMessage(err));
+        } finally {
+            setConfirmingStopId(null);
         }
     }
 
@@ -119,11 +141,19 @@ export default function RouteTab({ tripId }) {
             ) : (
                 <div className={"route-tab__body" + (hasMap ? " route-tab__body--with-map" : "")}>
                     <div className="route-tab__list">
-                        <StopList stops={stops} onEdit={setEditingStop} onDelete={handleDeleteFromCard} />
+                        <StopList
+                            stops={stops}
+                            onEdit={setEditingStop}
+                            onDelete={handleDeleteFromCard}
+                            onConfirm={handleConfirmStop}
+                            confirmingStopId={confirmingStopId}
+                        />
                     </div>
                     {hasMap && (
                         <aside className="route-tab__map" aria-label="Карта маршрута">
-                            <RouteMap stops={stops} />
+                            <Suspense fallback={<MapLoading />}>
+                                <RouteMap stops={stops} />
+                            </Suspense>
                         </aside>
                     )}
                 </div>

@@ -1,5 +1,5 @@
 import StopCard from "./StopCard";
-export default function StopList({ stops, onEdit, onDelete }) {
+export default function StopList({ stops, onEdit, onDelete, onConfirm, confirmingStopId }) {
     const groups = new Map();
     for (const stop of stops) {
         if (!groups.has(stop.day_number)) groups.set(stop.day_number, []);
@@ -14,7 +14,14 @@ export default function StopList({ stops, onEdit, onDelete }) {
                     <h3 className="stop-list__day-title">День {day}</h3>
                     <ul className="stop-list__items">
                         {groups.get(day).map((stop) => (
-                            <StopCard key={stop.id} stop={stop} onEdit={onEdit} onDelete={onDelete} />
+                            <StopCard
+                                key={stop.id}
+                                stop={stop}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                                onConfirm={onConfirm}
+                                isConfirming={confirmingStopId === stop.id}
+                            />
                         ))}
                     </ul>
                 </section>

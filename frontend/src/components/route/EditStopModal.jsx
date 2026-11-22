@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import LocationPicker from "./LocationPicker";
+import { lazy, Suspense, useEffect, useState } from "react";
 import {
     STATUS_OPTIONS,
     coordinatesPatch,
@@ -7,6 +6,8 @@ import {
     getStopLocation,
     validateStopForm,
 } from "./stopUtils";
+
+const LocationPicker = lazy(() => import("./LocationPicker"));
 
 // Модальное окно редактирования точки
 export default function EditStopModal({ stop, onSave, onDelete, onClose }) {
@@ -110,7 +111,13 @@ export default function EditStopModal({ stop, onSave, onDelete, onClose }) {
 
                 <div className="stop-form__field">
                     <span className="stop-form__label">Место на карте</span>
-                    <LocationPicker value={location} onChange={setLocation} />
+                    <Suspense fallback={<div className="location-picker location-picker--loading">Загружаем карту…</div>}>
+                        <LocationPicker
+                            value={location}
+                            onChange={setLocation}
+                            onPlaceSelect={setTitle}
+                        />
+                    </Suspense>
                 </div>
 
                 {submitError && (

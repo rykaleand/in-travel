@@ -1,70 +1,107 @@
-import { useEffect, useRef } from "react";
-import L from "leaflet";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { useEffect, useRef, useState } from "react";
+import { LngLatBounds, Map, Marker, NavigationControl, Popup } from "maplibre-gl";
 import { getStopLocation } from "./stopUtils";
-import { AttributionControl, MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { OPEN_FREE_MAP_STYLE } from "./maplibre-config";
 
-const stopIcon = L.icon({
-    iconUrl: markerIcon,
-    iconRetinaUrl: markerIcon2x,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-});
+function makeStopMarker(dayNumber) {
+    const element = document.createElement("div");
+    element.className = "route-stop-marker";
+    element.textContent = String(dayNumber);
+    return element;
+}
 
-function FitToMarkers({ positions }) {
-    const map = useMap();
-    const latest = useRef(positions);
-    latest.current = positions;
-    const key = positions.map((position) => position.join(",")).join("|");
+function makeStopPopup(stop) {
+    const content = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = stop.title;
+    const day = document.createElement("div");
+    day.textContent = `День ${stop.day_number}`;
+    content.append(title, day);
+    return content;
+}
 
-    useEffect(() => {
-        if (latest.current.length === 0) return;
-        map.fitBounds(L.latLngBounds(latest.current), { padding: [32, 32], maxZoom: 14 });
-    }, [key, map]);
+function focusMapOnStops(map, located, duration = 500) {
+    if (located.length === 0) return;
+    map.resize();
 
-    return null;
+    if (located.length === 1) {
+        const { longitude, latitude } = located[0].location;
+        map.easeTo({ center: [longitude, latitude], zoom: 15, duration, essential: false });
+        return;
+    }
+
+    const bounds = located.reduce(
+        (result, { location }) => result.extend([location.longitude, location.latitude]),
+        new LngLatBounds(),
+    );
+    const mapWidth = map.getContainer().clientWidth;
+    const padding = Math.max(32, Math.min(72, Math.round(mapWidth * 0.08)));
+    map.fitBounds(bounds, {
+        padding,
+        maxZoom: 15,
+        duration,
+        essential: false,
+    });
 }
 
 export default function RouteMap({ stops }) {
-    const located = [];
-    for (const stop of stops) {
+    const containerRef = useRef(null);
+    const mapRef = useRef(null);
+    const markersRef = useRef([]);
+    const locatedRef = useRef([]);
+    const [isReady, setIsReady] = useState(false);
+
+    const located = stops.flatMap((stop) => {
         const location = getStopLocation(stop);
-        if (location) located.push({ stop, position: [location.latitude, location.longitude] });
-    }
-    if (located.length === 0) return null;
+        return location ? [{ stop, location }] : [];
+    });
+    locatedRef.current = located;
 
-    const positions = located.map((item) => item.position);
+    useEffect(() => {
+        const map = new Map({
+            container: containerRef.current,
+            style: OPEN_FREE_MAP_STYLE,
+            center: [0, 20],
+            zoom: 2,
+            attributionControl: true,
+        });
+        map.addControl(new NavigationControl(), "top-left");
+        map.on("load", () => setIsReady(true));
+        mapRef.current = map;
 
-    return (
-        <div className="route-map">
-            <MapContainer
-                center={positions[0]}
-                zoom={5}
-                scrollWheelZoom={false}
-                attributionControl={false}
-                className="route-map__container"
-            >
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <FitToMarkers positions={positions} />
-                {located.map(({ stop, position }) => (
-                    <Marker key={stop.id} position={position} icon={stopIcon}>
-                        <Popup>
-                            {stop.title}
-                            <br />
-                            День {stop.day_number}
-                        </Popup>
-                    </Marker>
-                ))}
-                <AttributionControl prefix={false} />
-            </MapContainer>
-        </div>
-    );
+        return () => {
+            markersRef.current.forEach((marker) => marker.remove());
+            markersRef.current = [];
+            map.remove();
+            mapRef.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!isReady || !containerRef.current || !mapRef.current) return undefined;
+        const observer = new ResizeObserver(() => {
+            requestAnimationFrame(() => {
+                if (mapRef.current) focusMapOnStops(mapRef.current, locatedRef.current, 0);
+            });
+        });
+        observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, [isReady]);
+
+    useEffect(() => {
+        const map = mapRef.current;
+        if (!map || !isReady || located.length === 0) return;
+
+        markersRef.current.forEach((marker) => marker.remove());
+        markersRef.current = located.map(({ stop, location }) => (
+            new Marker({ element: makeStopMarker(stop.day_number), anchor: "bottom" })
+                .setLngLat([location.longitude, location.latitude])
+                .setPopup(new Popup({ offset: 18 }).setDOMContent(makeStopPopup(stop)))
+                .addTo(map)
+        ));
+
+        focusMapOnStops(map, located);
+    }, [isReady, stops]);
+
+    return <div ref={containerRef} className="route-map route-map__container" aria-label="Карта маршрута" />;
 }

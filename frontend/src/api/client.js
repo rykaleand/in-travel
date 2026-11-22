@@ -1,6 +1,10 @@
-// Все запросы к бэкенду (fetch). Адрес сервера: http://localhost:5000.
+// В разработке backend работает на localhost:5000.
+// На хостинге VITE_API_URL задаёт отдельный адрес API; если переменной нет,
+// запросы идут на тот же домен, с которого открыт frontend.
 // Владелец: общий, каждый добавляет функции для своих экранов.
-const API_URL = "http://localhost:5000";
+const API_URL = (
+  import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "http://localhost:5000" : "")
+).replace(/\/+$/, "");
 
 // Общая функция: отправляет запрос, возвращает JSON или бросает ошибку с понятным текстом.
 export async function request(path, options = {}) {
@@ -28,17 +32,29 @@ export async function request(path, options = {}) {
   }
   return data;
 }
-// Сохраняет билет поездки: PUT /trips/<id>/ticket.
-export function updateTicket(tripId, data) {
-    return request(`/trips/${tripId}/ticket`, {
+// Билеты поездки: отдельные записи, их может быть несколько.
+export function getTickets(tripId) {
+    return request(`/trips/${encodeURIComponent(tripId)}/tickets`);
+}
+
+export function createTicket(tripId, data) {
+    return request(`/trips/${encodeURIComponent(tripId)}/tickets`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    });
+}
+
+export function updateTicket(ticketId, data) {
+    return request(`/tickets/${encodeURIComponent(ticketId)}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            ticket_link: data.ticket_link ?? null,
-            flight_number: data.flight_number ?? null,
-            flight_time: data.flight_time ?? null,
-        }),
+        body: JSON.stringify(data),
     });
+}
+
+export function deleteTicket(ticketId) {
+    return request(`/tickets/${encodeURIComponent(ticketId)}`, { method: "DELETE" });
 }
 // POST /trips: создать поездку по названию.
 // data: { name } — название поездки.
