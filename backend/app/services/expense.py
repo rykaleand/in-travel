@@ -84,3 +84,22 @@ def create_expense(trip_id, request):
         ],
     )
     return expense_repository.create(expense)
+
+
+def add_participant_to_all_expenses(trip_id, participant_id):
+    """Новый участник скидывается на все траты поездки: каждую трату делим заново, уже с ним.
+
+    Пример: ужин 100 был на двоих (50 + 50), добавили третьего -> 33.34 + 33.33 + 33.33.
+    """
+    for expense in expense_repository.get_by_trip(trip_id):
+        participant_ids = [share.participant_id for share in expense.shares]
+        if participant_id in participant_ids:
+            continue  # уже делит эту трату, пересчитывать нечего
+        participant_ids.append(participant_id)
+
+        share_amounts = split_amount(expense.amount, len(participant_ids))
+        shares = [
+            ExpenseShare(participant_id=pid, share_amount=share_amount)
+            for pid, share_amount in zip(participant_ids, share_amounts)
+        ]
+        expense_repository.set_shares(expense.id, shares)

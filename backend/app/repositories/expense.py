@@ -45,6 +45,21 @@ def create(expense):
     return _to_domain(row)
 
 
+def set_shares(expense_id, shares):
+    """Сохраняет новые доли расхода: у кого доля уже была — меняем сумму, новых участников добавляем."""
+    row = db.session.get(ExpenseModel, expense_id)
+    existing = {share.participant_id: share for share in row.shares}
+    for share in shares:
+        if share.participant_id in existing:
+            existing[share.participant_id].share_amount = share.share_amount
+        else:
+            row.shares.append(
+                ExpenseShareModel(participant_id=share.participant_id, share_amount=share.share_amount)
+            )
+    db.session.commit()
+    return _to_domain(row)
+
+
 # Два вспомогательных запроса для проверок в сервисе расходов.
 # Когда Backend 1 сделает репозитории поездок и участников, их можно перенести туда.
 def trip_exists(trip_id):
