@@ -1,6 +1,7 @@
-import { useState } from "react";
-import LocationPicker from "./LocationPicker";
+import { lazy, Suspense, useState } from "react";
 import { errorMessage, toCoordinates, validateStopForm } from "./stopUtils";
+
+const LocationPicker = lazy(() => import("./LocationPicker"));
 
 // Форма добавления точки
 //   onSubmit(data) — async, при ошибке бросает исключение;
@@ -62,7 +63,13 @@ export default function AddStopForm({ onSubmit, onCancel, defaultDay = 1 }) {
 
             <div className="stop-form__field">
                 <span className="stop-form__label">Место на карте (необязательно)</span>
-                <LocationPicker value={location} onChange={setLocation} />
+                <Suspense fallback={<div className="location-picker location-picker--loading">Загружаем карту…</div>}>
+                    <LocationPicker
+                        value={location}
+                        onChange={setLocation}
+                        onPlaceSelect={setTitle}
+                    />
+                </Suspense>
             </div>
 
             {submitError && (

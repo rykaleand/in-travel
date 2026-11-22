@@ -42,6 +42,18 @@
     align-items: flex-start;
 }
 
+.ticket-info + .ticket-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border);
+}
+
+.ticket-info__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 .ticket-info__route {
     display: flex;
     flex-wrap: wrap;

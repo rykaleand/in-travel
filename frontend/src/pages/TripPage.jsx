@@ -48,21 +48,6 @@ export default function TripPage() {
         };
     }, [invite_code, reloadKey]);
 
-    function handleTicketSaved(ticket) {
-        setTrip((prev) => {
-            // Ответ предыдущей поездки не должен менять текущую или ещё загружающуюся.
-            if (!prev || prev.id !== ticket.trip_id) return prev;
-
-            return {
-                ...prev,
-                ticket_link: ticket.ticket_link,
-                flight_number: ticket.flight_number,
-                flight_time: ticket.flight_time,
-                aviasales: ticket.aviasales,
-            };
-        });
-    }
-
     function renderContent() {
         if (loadError) {
             return (
@@ -87,7 +72,7 @@ export default function TripPage() {
             case "route":
                 return <RouteTab tripId={trip.id} />;
             case "tickets":
-                return <TicketsTab trip={trip} onTicketSaved={handleTicketSaved} />;
+                return <TicketsTab key={trip.id} tripId={trip.id} />;
             // key={trip.id}: в другой поездке вкладка создаётся заново и не покажет данные предыдущей.
             case "budget":
                 return <BudgetTab key={trip.id} tripId={trip.id} />;

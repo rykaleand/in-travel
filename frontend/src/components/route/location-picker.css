@@ -20,3 +20,147 @@
 .location-picker > button {
   margin-top: 8px;
 }
+
+.location-picker--loading {
+  display: grid;
+  min-height: 300px;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+
+.location-picker__search {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 10px 0;
+}
+
+.location-picker__search > label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.location-picker__search > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.location-picker__search input {
+  min-width: 0;
+}
+
+.location-picker__coordinates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  gap: 8px;
+  align-items: end;
+  margin: 10px 0;
+}
+
+.location-picker__coordinates label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.location-picker__coordinates input {
+  min-width: 0;
+}
+
+.location-picker__marker {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: linear-gradient(135deg, #2f80d9, #1c5d96);
+  box-shadow: 0 3px 9px rgba(18, 72, 121, 0.35);
+  transform: rotate(-45deg);
+}
+
+.location-picker__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.location-picker__message {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.location-picker__suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.location-picker__suggestions button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.location-picker__suggestions button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.location-picker__suggestions button > span:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.location-picker__suggestions small {
+  color: var(--color-text-muted);
+}
+
+.location-picker__search-results {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.location-picker__search-results button > span:last-child {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.location-picker__attribution {
+  margin: 10px 0 0;
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.location-picker__attribution a {
+  color: inherit;
+}
+
+@media (max-width: 560px) {
+  .location-picker__coordinates {
+    grid-template-columns: 1fr;
+  }
+
+  .location-picker__search > div {
+    grid-template-columns: 1fr;
+  }
+}

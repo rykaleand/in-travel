@@ -10,7 +10,7 @@ function formatFlightTime(value) {
     return `${day} ${MONTHS[month - 1]} ${year}, ${timePart.slice(0, 5)}`;
 }
 
-export default function TicketInfo({ ticket, onEdit }) {
+export default function TicketInfo({ ticket, onEdit, onDelete }) {
     const { ticket_link, flight_number, flight_time, aviasales } = ticket;
     const isEmpty = !ticket_link && !flight_number && !flight_time;
 
@@ -64,9 +64,14 @@ export default function TicketInfo({ ticket, onEdit }) {
                 )}
             </dl>
 
-            <button type="button" className="btn btn--secondary" onClick={onEdit}>
-                Изменить
-            </button>
+            <div className="ticket-info__actions">
+                <button type="button" className="btn btn--secondary" onClick={onEdit}>
+                    Изменить
+                </button>
+                <button type="button" className="btn btn--secondary" onClick={onDelete}>
+                    Удалить
+                </button>
+            </div>
         </div>
     );
 }
