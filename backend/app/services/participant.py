@@ -1,6 +1,7 @@
 from ..domain.participant import Participant
 from ..repositories import participant as participant_repository
 from ..repositories import trip as trip_repository
+from . import expense as expense_service
 
 MAX_NAME_LENGTH = 50
 
@@ -38,4 +39,7 @@ def add_participant(trip_id, first_name, last_name):
         first_name=_clean_name(first_name, "Имя"),
         last_name=_clean_name(last_name, "Фамилия"),
     )
-    return participant_repository.create(participant)
+    participant = participant_repository.create(participant)
+    # Новый участник скидывается на все уже добавленные траты поездки (#85)
+    expense_service.add_participant_to_all_expenses(trip_id, participant.id)
+    return participant
